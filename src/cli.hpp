@@ -5,7 +5,7 @@
 #include <string>
 
 namespace cli {
-
+	//single POD struct is implemented because it  handles everthing about the cli parsing.It is clean and extendable
 	struct Options {
 		bool showHelp = false;
 		bool showVersion = false;

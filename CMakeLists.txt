@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(repoctx
 src/main.cpp	
- "src/cli.hpp" "src/cli.cpp")
+ "src/cli.hpp" "src/cli.cpp" "src/fs_travel.hpp" "src/fs_travel.cpp")

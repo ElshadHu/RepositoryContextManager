@@ -1,8 +1,11 @@
 #include <iostream>
 #include <string>
 #include "cli.hpp"
+#include "fs_travel.hpp"
+#include <filesystem>
 
 int main(int argc, char**argv) {
+	
 	try {
 		cli::Options opt = cli::parse(argc, argv);
 		if (opt.showVersion) {
@@ -17,7 +20,7 @@ int main(int argc, char**argv) {
 			return 0;
 		}
 		for (const auto inputFile : opt.inputFiles) {
-			std::cout << " - " << inputFile << '\n';
+			iterateOverDirectory(std::filesystem::path(inputFile));
 		}
 		if (!opt.outputFile.empty()) {
 			std::cout << "you need to write output to " << opt.outputFile << '\n';
