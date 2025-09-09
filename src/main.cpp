@@ -1,11 +1,26 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
+#include <iostream>
 #include "cli.hpp"
 #include "fs_travel.hpp"
-#include <filesystem>
+#include "git_info.hpp"
+
 
 int main(int argc, char**argv) {
+
+	std::filesystem::path root = std::filesystem::absolute(".");
+	gitInfo::GitInfo gitData = gitInfo::getGitData(root.string());
 	
+	if (!gitData.m_isGitRepository) {
+		std::cout << "that is not a git repository\n";
+	}
+	else {
+		std::cout << "- Commit: " << gitData.m_commit << '\n';
+		std::cout << "- Branch: " << gitData.m_branch << '\n';
+		std::cout << "- Author: " << gitData.m_author << '\n';
+		std::cout << "- Date: " << gitData.m_date << '\n';
+	}
 	try {
 		cli::Options opt = cli::parse(argc, argv);
 		if (opt.showVersion) {
