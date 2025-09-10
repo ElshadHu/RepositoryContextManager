@@ -20,12 +20,14 @@ namespace gitInfo {
 	}
 
 	bool getHeadReference(git_repository* repo,git_reference** headRef) {
+	
 		if (git_repository_head(headRef, repo) == 0)
 			return true;
 
 			return false;
 	}
 	bool getCommitInfo(git_repository* repo, const git_oid* oid, GitInfo& info) {
+
 		git_commit* commit = nullptr;
 		if (git_commit_lookup(&commit, repo, oid) != 0) return false;
 		//getting SHA

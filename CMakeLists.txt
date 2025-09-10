@@ -6,15 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(repoctx
     src/main.cpp
-    src/cli.hpp
     src/cli.cpp
-    src/fs_travel.hpp
     src/fs_travel.cpp
-    src/git_info.hpp 
-    src/git_info.cpp)
+    src/git_info.cpp
+)
 
 target_include_directories(repoctx PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    src
     "D:/osdProjects/vcpkg/installed/x64-windows/include"
 )
 

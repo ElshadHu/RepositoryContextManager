@@ -5,6 +5,7 @@
 #include <string>
 #include <git2.h>
 
+namespace fs = std::filesystem;
 namespace gitInfo {
 
 	struct GitInfo {
