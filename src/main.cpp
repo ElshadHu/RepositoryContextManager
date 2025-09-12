@@ -7,6 +7,27 @@
 #include "git_info.hpp"
 
 
+//helper functions for finding .git
+
+std::filesystem::path findGitRepository(const std::filesystem::path& beginPath) {
+		std::filesystem::path searchingPath = std::filesystem::absolute(beginPath);//we get the absolute path
+		//if it exists it will return  this path  that is the first check
+		//later when we create the parentPath  and will change the path and gets the parent directory until it finds or path becomes same . if it does not find C:/ = C:/ break it and return empty {}
+		while (!searchingPath.empty()) {
+			if (std::filesystem::exists(searchingPath / ".git")) { 
+				return searchingPath;
+				}
+
+			auto parentPath = searchingPath.parent_path();
+			if (parentPath == searchingPath) {
+				break;
+			}
+			searchingPath = parentPath;
+		}
+		//if did not find return empty path
+		return std::filesystem::path{};
+}
+
 int main(int argc, char**argv) {
 	try {
 		cli::Options opt = cli::parse(argc, argv);
@@ -22,13 +43,21 @@ int main(int argc, char**argv) {
 			return 0;
 		}
 		for (const auto inputFile : opt.inputFiles) {
-			std::cout << "REPOSITORY CONTEXT\n";
-			std::cout << "Filesystem location\n";
+			std::cout << "# Repository Context\n\n";
+			std::cout << "## File System Location\n\n";
 			const auto path = std::filesystem::path(inputFile);
 			std::filesystem::path absolutePath = std::filesystem::absolute(path);
 			std::cout << absolutePath << '\n';
 
-			gitInfo::GitInfo gitData = gitInfo::getGitData(".");
+
+			std::filesystem::path gitRepoPath = findGitRepository(absolutePath);
+			gitInfo::GitInfo gitData;
+
+			if (!gitRepoPath.empty()) {
+				gitData = gitInfo::getGitData(gitRepoPath.string());
+			}
+
+
 
 			if (!gitData.m_isGitRepository) {
 				std::cout << "that is not a git repository\n";
@@ -39,10 +68,10 @@ int main(int argc, char**argv) {
 				std::cout << "- Author: " << gitData.m_author << '\n';
 				std::cout << "- Date: " << gitData.m_date << '\n';
 			}
-			std::cout << "\n STRUCTURE \n";
+			std::cout << "\n## Structure\n```\n";
 			fsTravel::displayDirTree(path, 0);
 			std::cout << "'''\n";
-			std::cout << "\nFileContents\n";
+			std::cout << "\n ##FileContents\n";
 			fsTravel::displayFileContents(path);
 
 		}

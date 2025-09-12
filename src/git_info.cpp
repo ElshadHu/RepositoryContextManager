@@ -1,20 +1,15 @@
 #include "git_info.hpp"
 #include <ctime> //for  converting timestamps into human readble format it is better because of simplicity compared to chrono
 
-//git_libgit2_init()  is written before writing other functions for global state and threading .It will return how may times it is called or error code
-//git_repository_head(gith_reference**out,git_repository*reop) pointer to the reference which will be retrieved and a repository object after it is done git_reference_free should be called for memeory
-//git_reference_shorthand(head_ref)     // Get branch name we dont need to free the momory it is owned by reference
-//git_reference_target(head_ref)        // Get commit OID git_reference_resolve() and then this function (or maybe use git_reference_name_to_id() to directly reslove it
-//git_commit_lookup(&commit, repo, oid)  // Get commit object the return object should be released with git_commit_free
-//git_commit_author(commit)              // Get author signature
-//git_commit_free(commit)                // Clean up commit
+
 namespace gitInfo {
 
 	bool checkRepositoryOpen(const std::string& path, git_repository** repo) {
-			git_libgit2_init();
+			git_libgit2_init();//after opening we need to shut it down for avoiding memory leak
 			if (git_repository_open(repo, path.c_str()) == 0) {
-				return true;
+				return true; 
 			}
+			//after opening we need to shut it down for avoiding memory leak here directly shut it down
 				git_libgit2_shutdown(); 
 				return false;
 	}
@@ -32,11 +27,12 @@ namespace gitInfo {
 		if (git_commit_lookup(&commit, repo, oid) != 0) return false;
 		//getting SHA
 			char sha[GIT_OID_HEXSZ + 1];
+			// it is unique string via hash  we need to convert it
 			git_oid_tostr(sha, sizeof(sha), oid);
 			info.m_commit = sha;
-			//getting author and date
+			//getting author and date 
 			const git_signature* author = git_commit_author(commit);
-			
+			//if it points then get the data via struct
 			if (author) {
 				
 				info.m_author = std::string(author->name) + "< " + std::string(author->email) + " > ";
@@ -50,7 +46,7 @@ namespace gitInfo {
 					}
 				}
 			}
-
+			//after opening  we need to make it free because of memory leaks
 			git_commit_free(commit);
 			return true;
 	}
@@ -72,7 +68,7 @@ namespace gitInfo {
 			return info;
 		}
 
-		const char* branch = git_reference_shorthand(headRef);
+		const char* branch = git_reference_shorthand(headRef);//will get us the info in a short form
 		if (branch) info.m_branch = branch;
 
 		const git_oid* oid = git_reference_target(headRef);

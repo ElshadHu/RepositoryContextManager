@@ -8,7 +8,7 @@ namespace cli {
 		Options options;
 
 		for (int i = 1; i < argc;i++) {
-			std::string_view argument = argv[i];
+			std::string_view argument = argv[i]; //every time gets the imput and checks the below conditions
 			if (argument == "-h" || argument == "--help") {
 				options.showHelp = true;
 			}

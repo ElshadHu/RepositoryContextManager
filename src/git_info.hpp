@@ -7,7 +7,7 @@
 
 namespace fs = std::filesystem;
 namespace gitInfo {
-
+	//as a container for making clear and simpler
 	struct GitInfo {
 		bool m_isGitRepository = false;
 		std::string m_commit;
@@ -15,7 +15,6 @@ namespace gitInfo {
 		std::string m_author;
 		std::string m_date;
 	};
-
 	GitInfo getGitData(const std::string&path);
 	bool checkRepositoryOpen(const std::string& path, git_repository** repo);
 	bool getHeadReference(git_repository* repo,git_reference**headRef);
