@@ -85,7 +85,7 @@ The tool generates structured markdown output:
 ```bash
 - Commit: e45f8911e2ca40223faf2309bf1996443f2df336
 - Branch: main
-- Author: Developer Name <dev@email.com>
+- Author:  Your name<yourmail@email.com>
 - Date: Thu Aug 28 16:07:19 2025 -0400
 ```
 ## Structure
