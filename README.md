@@ -13,7 +13,7 @@ Command-line tool that analyzes  local git repositories and creates a text file 
 CMake 3.16 or higher
 Microsoft vcpkg package manager
 Visual Studio 2019/2022 or equivalent C++17 compiler
-Git(for repository analysis features
+Git(for repository analysis features)
 
 # Installation
 
