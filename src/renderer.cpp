@@ -33,7 +33,7 @@ namespace output {
 	}
 
 	void writeGitInfo(std::ostream& o, const std::filesystem::path& absolute) {
-		o << "## GIT INFO \n\n";
+		o << "### GIT INFO \n\n";
 
 		const auto repo = findGitRepository(absolute);
 		gitInfo::GitInfo gi;
@@ -50,13 +50,9 @@ namespace output {
 
 	}
 
-	bool writeCliCommands(const std::string& filename, cli::Options& opt) {
-		try {
-			std::ofstream outFile;
-			std::ostream& o = targetOut(outFile, filename);
-
+	bool writeCliCommands( const cli::Options& opt) {
 			if (opt.showHelp) {
-				outFile << "the usage of repoctx [path..] [options]\n"
+				std::cout << "the usage of repoctx [path..] [options]\n"
 					<< "-h --help Show help\n"
 					<< "-v --version Show version\n"
 					<< " -o --output  Write output to file\n";
@@ -64,15 +60,12 @@ namespace output {
 			}
 
 			if (opt.showVersion) {
-				outFile << std::string(opt.inputFiles[0]) + "release 0.1\n";
+				std::cout << "repoctx release 0.1\n";
 				return true;
 			}
+
+			
 			return false;
-		}
-		catch (const std::exception& err) {
-			std::cerr << err.what() << '\n';
-			return false;
-		}
 
 	}
 
@@ -89,7 +82,7 @@ namespace output {
 		//calling my function
 		fsTravel::travelDirTree(path, 0);
 
-		//resotring cout
+		//restoring cout
 		std::cout.rdbuf(original_out);
 		o << caughtOut.str() << "\n\n";
 
@@ -131,7 +124,7 @@ namespace output {
 
 		}
 		catch (const std::exception& err) {
-			std::cerr << "Errorr: " << err.what() << '\n';
+			std::cerr << "Error with rendering: " << err.what() << '\n';
 		}
 	}
 

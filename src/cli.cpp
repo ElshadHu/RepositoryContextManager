@@ -29,8 +29,8 @@ namespace cli {
 			}
 		}
 
-		if (options.inputFiles.empty()) {
-			options.inputFiles.push_back(".");
+		if (options.inputFiles.empty() && !options.showHelp && !options.showVersion) {
+			options.showHelp = true;
 		}
 		return options;
 }

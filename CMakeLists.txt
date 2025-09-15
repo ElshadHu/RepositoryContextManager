@@ -18,7 +18,7 @@ target_include_directories(repoctx PRIVATE src)
 target_include_directories(repoctx PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Windows-only manual libgit2 setup (bulletproof approach)
+# Windows-only manual libgit2 setup 
 if(WIN32)
     target_include_directories(repoctx PRIVATE 
         "${CMAKE_CURRENT_SOURCE_DIR}/../vcpkg/installed/x64-windows/include"
@@ -29,7 +29,7 @@ if(WIN32)
     target_compile_definitions(repoctx PRIVATE _CRT_SECURE_NO_WARNINGS)
     message(STATUS "Using manual libgit2 paths for Windows")
 else()
-    # For Linux/macOS - try pkg-config
+   
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBGIT2 REQUIRED libgit2)
     target_link_libraries(repoctx PRIVATE ${LIBGIT2_LIBRARIES})

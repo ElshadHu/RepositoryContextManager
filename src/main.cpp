@@ -8,25 +8,12 @@
 
 int main(int argc, char**argv) {
     try {
-        // Parse command line arguments
         cli::Options opt = cli::parse(argc, argv);
-
-        // Handle version flag
-        if (opt.showVersion) {
-            std::cout << "repoctx release 0.1\n";
+        if (output::writeCliCommands(opt)) {
             return 0;
         }
 
-     
-        if (opt.showHelp) {
-            std::cout << "Usage: repoctx [path...] [options]\n"
-                << "  -h, --help     Show help\n"
-                << "  -v, --version  Show version\n"
-                << "  -o, --output   Write output to file\n";
-            return 0;
-        }
-
-      
+        // Parse command line arguments
         output::renderRepositoryContext(opt.outputFile, opt);
 
     }
