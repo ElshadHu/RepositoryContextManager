@@ -10,10 +10,13 @@ add_executable(repoctx
     src/cli.cpp
     src/fs_travel.cpp
     src/git_info.cpp
-)
+ src/renderer.cpp
+ src/utils.cpp)
 
 # Include src directory for headers
 target_include_directories(repoctx PRIVATE src)
+target_include_directories(repoctx PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Windows-only manual libgit2 setup (bulletproof approach)
 if(WIN32)

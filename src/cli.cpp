@@ -17,12 +17,12 @@ namespace cli {
 			}
 			else if (argument == "-o" || argument == "--output") {
 			
-				if (i + 1 < argc) {
-					options.outputFile = argv[++i];
-			}
-			else {
-				throw std::runtime_error("Missing file name after " + std::string(argument));
-				}
+					if (i + 1 < argc) {
+						options.outputFile = argv[++i];
+					}
+				else {
+					throw std::runtime_error("Missing file name after " + std::string(argument));
+					}
 			}
 			else {
 				options.inputFiles.push_back(argument);

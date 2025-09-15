@@ -8,16 +8,24 @@
 #include <algorithm>
 #include <array>
 #include <iomanip>
+#include <stdexcept>
+#include "utils.hpp"
 
-#define SIZEOFFILE 16000
+#define SIZEOFFILE 16234
 namespace fsTravel {
 	namespace fs = std::filesystem;
 
-	void displayDirTree(const fs::path& pathToAnalyze, int depth = 0);
-	bool allowedExtensions(const std::string& ext);
-	void displayFileContents(const fs::path& pathToAnalyze);
+	struct Totals {
+		std::size_t m_totalLines;
+		std::size_t m_totalFiles;
+	};
+
+	void travelDirTree(const fs::path& pathToAnalyze,int depth);
+	void travelFileContents(const fs::path& filepath);
 	void readDisplayFile(const fs::path& filepath);
-	const std::string getLanguageExtension(const std::string& ext);
+	std::size_t countLines(const fs::path& filepath);
+	Totals getStats(const fs::path& pathToAnalyze);
+	
 
 }
 #endif
