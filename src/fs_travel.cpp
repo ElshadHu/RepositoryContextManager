@@ -65,16 +65,19 @@ namespace fsTravel {
 
 
 
-	void travelFileContents(const fs::path& pathToAnalyze) {
-		
+	TotalStatistics travelFileContents(const fs::path& pathToAnalyze) {
+		TotalStatistics totals{ 0,0,0 };
 		std::error_code errCode;
 		try {
 			if (fs::is_regular_file(pathToAnalyze)) {
 				if (allowedExtensions(pathToAnalyze.extension().string())) {
+					totals.m_totalFiles = 1;
+					totals.m_totalLines = countLines(pathToAnalyze);
+					totals.m_totalTokens = countTokens(pathToAnalyze);
+
 					readDisplayFile(pathToAnalyze);
-					return;
 				}
-				
+				return totals;
 			}
 
 			for (auto const& entry : fs::recursive_directory_iterator(pathToAnalyze, errCode)) {
@@ -92,6 +95,9 @@ namespace fsTravel {
 				if (entry.is_regular_file()) {
 					const auto extension = entry.path().extension().string();
 					if (allowedExtensions(extension)) {
+						++totals.m_totalFiles;
+						totals.m_totalLines += countLines(entry.path());
+						totals.m_totalTokens += countTokens(entry.path());
 						readDisplayFile(entry.path());
 					}
 				}
@@ -100,6 +106,7 @@ namespace fsTravel {
 		catch (const fs::filesystem_error& ex) {
 			std::cerr << "Filesystem error: " << ex.what() << '\n';
 		}
+		return totals;
 	}
 
 

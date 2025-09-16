@@ -91,19 +91,19 @@ namespace output {
 
 	
 
-	void writeFileContents(std::ostream& o, const std::filesystem::path& path) {
+	fsTravel::TotalStatistics writeFileContents(std::ostream& o, const std::filesystem::path& path) {
 		//capturing the output
 
 		std::streambuf* original_out = std::cout.rdbuf();
 		std::ostringstream caughtOut;
 		std::cout.rdbuf(caughtOut.rdbuf());
 		//calling the function
-		fsTravel::travelFileContents(path);
+		auto statistics = fsTravel::travelFileContents(path);
 		std::cout.rdbuf(original_out);
 
 		o << caughtOut.str();
 		o << '\n';
-
+		return statistics;
 	}
 
 
@@ -121,10 +121,11 @@ namespace output {
 				}
 				writeGitInfo(o, absolute);
 				writeFileStructure(o, absolute);
-				writeFileContents(o, absolute);
-
-				o << "## Summary\n";
-				o << "Repository analysis complete.\n\n";
+				 auto  statistics = writeFileContents(o, absolute);
+				 o << "## Summary\n";
+				 o << "- Total Files: " << statistics.m_totalFiles << '\n';
+				 o << "- Total Lines: " << statistics.m_totalLines << '\n';
+				 o << "- Total tokens: " << statistics.m_totalTokens << '\n';
 			}
 
 		}

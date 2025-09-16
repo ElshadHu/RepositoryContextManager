@@ -41,7 +41,7 @@ bool isExcludedDirectory(const std::filesystem::path& p) {
 
 bool isExcludedFile(const std::filesystem::path& p) {
 	const auto fileExtension = p.extension().string();
-	if (fileExtension == ".txt") return true;
+	if (fileExtension == ".gitignore") return true;
 	return false;
 
 }
@@ -57,6 +57,38 @@ bool allowedExtensions(const std::string& ext) {
 	return false;
 }
 
+
+std::size_t countTokens(const std::filesystem::path& filepath) {
+	std::ifstream file(filepath);
+	if (!file) {
+		std::cerr << "file did not open for tokens: " << filepath << '\n';
+		return 0;
+	}
+	char perChar;
+	std::size_t numOfChars = 0;
+	while (file.get(perChar)) {
+		numOfChars++;
+	}
+
+	return numOfChars / 4;
+}
+
+
+
+std::size_t countLines(const std::filesystem::path& filepath) {
+
+	std::ifstream file(filepath);
+	if (!file) {
+		std::cerr << "file did not open for line counting: "<< filepath << '\n';
+		return 0;
+	}
+	std::size_t numOfLines = 0;
+	std::string line;
+	while (std::getline(file, line)) {
+		++numOfLines;
+	}
+	return numOfLines;
+}
 
 
 const std::string getLanguageExtension(const std::string& ext) {
