@@ -89,6 +89,8 @@ namespace output {
 
 	}
 
+	
+
 	void writeFileContents(std::ostream& o, const std::filesystem::path& path) {
 		//capturing the output
 
@@ -113,7 +115,10 @@ namespace output {
 				const auto absolute = std::filesystem::absolute(input);
 				o << "# Repository Context\n\n";
 				o << "## File System Location\n\n" << absolute.string() << "\n\n";
-
+				if (!std::filesystem::exists(absolute)) {
+					std::cerr << "Error: Path does not exist: " << absolute << std::endl;
+					continue;
+				}
 				writeGitInfo(o, absolute);
 				writeFileStructure(o, absolute);
 				writeFileContents(o, absolute);

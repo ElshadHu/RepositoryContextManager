@@ -16,6 +16,7 @@ namespace output {
 	void renderRepositoryContext(const std::string& filename,const cli::Options&opt);
 	void writeFileStructure(std::ostream& o, const std::filesystem::path& path);
 	void writeFileContents(std::ostream& o, const std::filesystem::path& path);
+
 	
 	
 

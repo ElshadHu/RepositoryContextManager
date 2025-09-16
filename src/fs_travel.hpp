@@ -23,6 +23,7 @@ namespace fsTravel {
 	void travelDirTree(const fs::path& pathToAnalyze,int depth);
 	void travelFileContents(const fs::path& filepath);
 	void readDisplayFile(const fs::path& filepath);
+	void travelSingleFile(const fs::path& filePath);
 	//std::size_t countLines(const fs::path& filepath);
 	//Totals getStatus(const fs::path& pathToAnalyze);
 	

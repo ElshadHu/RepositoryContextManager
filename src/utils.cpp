@@ -24,9 +24,9 @@
 
 
 
-
+ //constexpr for compile time
 bool isExcludedDirectory(const std::filesystem::path& p) {
-	static const std::array<std::string_view, 10> dirs{
+	constexpr std::array<std::string_view, 10> dirs{
 		".git","build","out","dist","node_modules","CMakeFiles",".vs",".idea","target","cmake-build-debug"
 	};
 	for (const auto& dir : p) {

@@ -10,10 +10,22 @@ namespace fsTravel {
 		return std::string(n * 3, ' '); 
 	}
 
+	void travelSingleFile(const fs::path& filePath) {
+	
+		if (allowedExtensions(filePath.extension().string())) {
+			std::cout << filePath.filename().string()<<'\n';
+		}
+	}
 	void  travelDirTree(const fs::path& pathToAnalyze, int depth) {
+	
 		std::error_code errCode;//empty err code
 
 		try {
+
+				if (fs::is_regular_file(pathToAnalyze)) {
+					travelSingleFile(pathToAnalyze);
+					return;
+					}
 			for (const auto& entry : fs::directory_iterator(pathToAnalyze, errCode)) {
 				if (errCode) {
 					std::cerr << "Error entering" << entry.path() << errCode.message() << '/\n';
@@ -54,8 +66,17 @@ namespace fsTravel {
 
 
 	void travelFileContents(const fs::path& pathToAnalyze) {
+		
 		std::error_code errCode;
 		try {
+			if (fs::is_regular_file(pathToAnalyze)) {
+				if (allowedExtensions(pathToAnalyze.extension().string())) {
+					readDisplayFile(pathToAnalyze);
+					return;
+				}
+				
+			}
+
 			for (auto const& entry : fs::recursive_directory_iterator(pathToAnalyze, errCode)) {
 				if (errCode) {
 					std::cerr << "Error accessing " << entry.path() << ": " << errCode.message() << '\n';
