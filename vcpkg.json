@@ -1,0 +1,7 @@
+{
+  "name": "repoctx",
+  "version": "0.1.0",
+  "dependencies": [
+    "libgit2"
+  ]
+}

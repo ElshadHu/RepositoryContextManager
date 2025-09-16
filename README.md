@@ -1,4 +1,4 @@
-# RepositoryContextManager
+# RepositoryContextPackager
 Command-line tool that analyzes  local git repositories and creates a text file containing repository content optimized for sharing with Large Language Models (LLMs).This tool helps developers efficiently share their codebase context with Ai tools such as ChatGPT via collection repository information,project structure and file contents into a single, well-designed document.
 
 # Features
