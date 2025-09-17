@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 void setFiltering(const std::string& include, const std::string& exclude);
  bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension);

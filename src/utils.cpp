@@ -57,7 +57,7 @@
 		
 		std::stringstream ss(includedFiles);
 		std::string str;
-		std::vector<std::string>fileExtensions;
+		std::vector<std::string> fileExtensions;
 
 		while (std::getline(ss, str, ',')) {
 			std::size_t posFirst = str.find_first_not_of('\t');
