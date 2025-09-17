@@ -17,11 +17,11 @@ Command-line tool that analyzes  local git repositories and creates a text file 
 
 # 1. Install vcpkg and dependencies
 
-# Clone vcpkg (if not already installed)
+# Clone vcpkg  Windows (if not already installed)
 ```bash
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
-./bootstrap-vcpkg.bat  # Windows
+./bootstrap-vcpkg.bat  
 set VCPKG_ROOT=%CD%
 # Install libgit2
 ```
@@ -32,21 +32,29 @@ set VCPKG_ROOT=%CD%
 # 2. Build the project
 ## Clone this repository
 ```bash
-git clone [your-repo-url]
+git clone https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
-cmake --preset default
+cmake -B build -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake"
 cmake --build build --config Release
 ```
 # Linux
 ```bash
-# Install dependencies
-sudo apt update
-sudo apt install build-essential cmake libgit2-dev pkg-config git
+1.
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+chmod +x ./bootstrap-vcpkg.sh
+./bootstrap-vcpkg.sh
 
-# Build 
-git clone <your-repo-url>
+2.
+set VCPKG_ROOT=%CD%
+chmod  +x ./vcpkg
+./vcpkg install libgit2
+
+3.
+git clone   https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
-cmake --preset default
+
+cmake -G "Ninja" -B build
 cmake --build build
 ```
 
@@ -56,13 +64,13 @@ cmake --build build
 brew install cmake libgit2 pkg-config git
 
 # Build 
-git clone <your-repo-url>
+git clone https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
-cmake --preset default
+cmake -B build
 cmake --build build
 ```
 # Usage
-# Basic Commands
+## Basic Commands
 ```bash
 # Analyze current directory
 repoctx .
@@ -145,8 +153,7 @@ Total Tokens: 4,532
 # Testing from Source
 
 ```bash
-# Configure for development
-cmake --preset default
+
 
 # Build
 cmake --build build --config Release
@@ -174,7 +181,6 @@ RepositoryContextPackager/
 │   ├── renderer.hpp      # Renderer declarations
 │   └── utils.cpp         # Utility functions
 ├── CMakeLists.txt        # Build configuration
-├── CMakePresets.json     # Build presets
 ├── vcpkg.json           # Dependencies
 └── README.md            # This file           
 ```
