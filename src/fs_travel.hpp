@@ -25,7 +25,6 @@ namespace fsTravel {
 	TotalStatistics travelFileContents(const fs::path& filepath);
 	void readDisplayFile(const fs::path& filepath);
 	void travelSingleFile(const fs::path& filePath);
-	//std::size_t countLines(const fs::path& filepath);
 	
 	
 

@@ -6,12 +6,14 @@
 #include <array>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 
-
- bool isExcludedDirectory(const std::filesystem::path& p);
- bool isExcludedFile(const std::filesystem::path& p);
- bool allowedExtensions(const std::string& ext);
+void setFiltering(const std::string& include, const std::string& exclude);
+ bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension);
+ bool checkingExcludeInclude(const std::filesystem::path& filepath);
  const std::string getLanguageExtension(const std::string& ext);
  std::filesystem::path findGitRepository(const std::filesystem::path& beginPath);
  std::size_t countLines(const std::filesystem::path& filepath);
  std::size_t countTokens(const std::filesystem::path& filePath);
+ bool onlyIncludedExtensions(const std::string& extension,const std::string&includedFiles);
+ bool isGitIgnored(const std::filesystem::path& filePath);

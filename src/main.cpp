@@ -9,6 +9,9 @@
 int main(int argc, char**argv) {
     try {
         cli::Options opt = cli::parse(argc, argv);
+
+        setFiltering(opt.fileExtension, opt.excludePattern);
+
         if (output::writeCliCommands(opt)) {
             return 0;
         }

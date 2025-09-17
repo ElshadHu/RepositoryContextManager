@@ -11,10 +11,8 @@ namespace fsTravel {
 	}
 
 	void travelSingleFile(const fs::path& filePath) {
-	
-		if (allowedExtensions(filePath.extension().string())) {
+
 			std::cout << filePath.filename().string()<<'\n';
-		}
 	}
 	void  travelDirTree(const fs::path& pathToAnalyze, int depth) {
 	
@@ -22,7 +20,7 @@ namespace fsTravel {
 
 		try {
 
-				if (fs::is_regular_file(pathToAnalyze)) {
+				if (fs::is_regular_file(pathToAnalyze) && !isGitIgnored(pathToAnalyze)) {
 					travelSingleFile(pathToAnalyze);
 					return;
 					}
@@ -34,21 +32,18 @@ namespace fsTravel {
 				}
 				const auto filename = entry.path().filename().string();
 
-				if (isExcludedDirectory(entry.path()) || isExcludedFile(entry.path())) {
-					continue;
-				}
+				
 				std::cout << indent(depth);
 
-				if (entry.is_directory()) {
+				if (entry.is_directory() && !isGitIgnored(entry.path())) {
 					std::cout << filename << '\n';
 					
 					if (depth < 10) 
 						travelDirTree(entry.path(), depth + 1);
 					
 				}
-				else if (entry.is_regular_file()) {
+				else if (entry.is_regular_file() && !isGitIgnored(entry.path())) {
 					const auto extension = entry.path().extension().string();
-					if (allowedExtensions(extension))
 						std::cout << filename << "\n";
 				}
 
@@ -69,14 +64,16 @@ namespace fsTravel {
 		TotalStatistics totals{ 0,0,0 };
 		std::error_code errCode;
 		try {
-			if (fs::is_regular_file(pathToAnalyze)) {
-				if (allowedExtensions(pathToAnalyze.extension().string())) {
+			if (isGitIgnored(pathToAnalyze)) {
+				return TotalStatistics{ 0, 0, 0 };
+			}
+			if (fs::is_regular_file(pathToAnalyze) && checkingExcludeInclude(pathToAnalyze) && !isGitIgnored(pathToAnalyze)) {
+			
 					totals.m_totalFiles = 1;
 					totals.m_totalLines = countLines(pathToAnalyze);
 					totals.m_totalTokens = countTokens(pathToAnalyze);
 
 					readDisplayFile(pathToAnalyze);
-				}
 				return totals;
 			}
 
@@ -87,19 +84,14 @@ namespace fsTravel {
 					continue;
 				}
 
-				// Skip excluded directories and files
-				if (isExcludedDirectory(entry.path()) || isExcludedFile(entry.path())) {
-					continue;
-				}
+				
 
-				if (entry.is_regular_file()) {
+				if (entry.is_regular_file() && checkingExcludeInclude(entry.path()) && !isGitIgnored(entry.path())) {
 					const auto extension = entry.path().extension().string();
-					if (allowedExtensions(extension)) {
 						++totals.m_totalFiles;
 						totals.m_totalLines += countLines(entry.path());
 						totals.m_totalTokens += countTokens(entry.path());
 						readDisplayFile(entry.path());
-					}
 				}
 			}
 		}

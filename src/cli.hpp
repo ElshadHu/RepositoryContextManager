@@ -11,6 +11,11 @@ namespace cli {
 		bool showVersion = false;
 		std::string outputFile;
 		std::vector<std::string_view>inputFiles; //for getting more than one file
+		//for new featurues
+		std::string fileExtension;
+		std::string excludePattern;
+		std::string outputFormat = "markdown";
+		std::string maxFileSize;
 	};
 	Options parse(int argc, char** argv); //using the  main arguments which the first is size the second is vector
 }

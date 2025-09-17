@@ -9,21 +9,41 @@ namespace cli {
 
 		for (int i = 1; i < argc;i++) {
 			std::string_view argument = argv[i]; //every time gets the imput and checks the below conditions
+
 			if (argument == "-h" || argument == "--help") {
 				options.showHelp = true;
 			}
+
 			else if (argument == "-v" || argument == "--version") {
 				options.showVersion = true;
 			}
+
 			else if (argument == "-o" || argument == "--output") {
-			
-					if (i + 1 < argc) {
-						options.outputFile = argv[++i];
-					}
+
+				if (i + 1 < argc) {
+					options.outputFile = argv[++i];
+				}
 				else {
 					throw std::runtime_error("Missing file name after " + std::string(argument));
-					}
+				}
 			}
+
+			else if (argument == "--include" && i + 1 < argc) {
+				options.fileExtension = argv[++i];
+			}
+
+			else if (argument == "--exclude" && i + 1 < argc) {
+				options.excludePattern = argv[++i];
+			}
+
+			else if (argument == "--format" && i + 1 < argc) {
+				options.outputFormat = argv[++i];
+			}
+
+			else if (argument == "--max-file-size" && i + 1 < argc) {
+				options.maxFileSize = argv[++i];
+			}
+
 			else {
 				options.inputFiles.push_back(argument);
 			}
@@ -32,6 +52,7 @@ namespace cli {
 		if (options.inputFiles.empty() && !options.showHelp && !options.showVersion) {
 			options.showHelp = true;
 		}
+
 		return options;
-}
+	}
 }

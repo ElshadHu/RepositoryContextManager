@@ -1,5 +1,84 @@
 #include "utils.hpp"
 
+	//we are gonna initialize these variable and during the execution we will check
+	static  std::string m_includedExtension;
+	static std::string m_excludedExtension;
+
+
+	bool isGitIgnored(const std::filesystem::path& filePath) {
+		constexpr std::array<std::string_view, 22> ignoredGit{
+			".d", ".slo", ".lo", ".o", ".obj", ".gch", ".pch", ".ilk",
+		".pdb", ".so", ".dylib", ".dll", ".mod", ".smod", ".lai",
+		".la", ".a", ".lib", ".exe", ".out", ".app", ".dwo"
+		};
+		constexpr std::array<std::string_view, 3>ignoredDirs{
+			".vs","build","out"
+		};
+		std::string extension = filePath.extension().string();
+		std::string filename = filePath.filename().string();
+
+		//if it finds return it
+		if (std::find(ignoredGit.begin(), ignoredGit.end(), extension) != ignoredGit.end())
+			return true;
+		for (const auto& entry : filePath) {
+			std::string dirName = entry.string();
+			if (std::find(ignoredDirs.begin(), ignoredDirs.end(), dirName) != ignoredDirs.end())
+				return true;
+		}
+
+		return false;
+
+	}
+
+	void setFiltering(const std::string& include, const std::string& exclude) {
+		m_includedExtension = include;
+		m_excludedExtension = exclude;
+	}
+
+	bool checkingExcludeInclude(const std::filesystem::path& filepath) {
+		if (!m_includedExtension.empty() && !onlyIncludedExtensions(filepath.string(), m_includedExtension)) {
+			return false;
+		}
+		if (!m_excludedExtension.empty() && excludedExtensions(filepath.string(), m_excludedExtension)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	bool onlyIncludedExtensions(const std::string& filepath,const std::string&includedFiles) {
+		if (filepath.empty()) {
+			return false;
+		}
+		if (includedFiles.empty()) {
+			return true;
+		}
+		
+		std::stringstream ss(includedFiles);
+		std::string str;
+		std::vector<std::string>fileExtensions;
+
+		while (std::getline(ss, str, ',')) {
+			std::size_t posFirst = str.find_first_not_of('\t');
+			std::size_t posLast = str.find_last_not_of('\t');
+			str = str.substr(posFirst, posLast - posFirst + 1);
+			fileExtensions.push_back(str);
+		}
+
+		std::filesystem::path path(filepath);
+		std::string extension = path.extension().string();
+
+		for (auto& included : fileExtensions) {
+			if (included.size()>2 && included[0] == '*') {
+				included = included.substr(1);//remove *
+			}
+			if (included == extension) {
+				return true;
+			}
+		}
+		return false;
+
+	}
 
  std::filesystem::path findGitRepository(const std::filesystem::path& beginPath) {
 	std::filesystem::path searchingPath = std::filesystem::absolute(beginPath);//we get the absolute path
@@ -24,38 +103,18 @@
 
 
 
- //constexpr for compile time
-bool isExcludedDirectory(const std::filesystem::path& p) {
-	constexpr std::array<std::string_view, 10> dirs{
-		".git","build","out","dist","node_modules","CMakeFiles",".vs",".idea","target","cmake-build-debug"
-	};
-	for (const auto& dir : p) {
-		auto stringDir = dir.string();
-		if (std::find(dirs.begin(), dirs.end(), stringDir) != dirs.end()) return true;
-	}
-
-	return false;
-
-}
 
 
-bool isExcludedFile(const std::filesystem::path& p) {
-	const auto fileExtension = p.extension().string();
-	if (fileExtension == ".gitignore") return true;
-	return false;
 
-}
-
-bool allowedExtensions(const std::string& ext) {
-	constexpr std::array<std::string_view, 14> allowedExts{
-		".cpp", ".hpp", ".h", ".c",
-		".js", ".py", ".java", ".ts", ".go",
-		".json", ".yml", ".md", ".xml"
-	};
-	if (std::find(allowedExts.begin(), allowedExts.end(), ext) != allowedExts.end())
+bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension) {
+	if (excludedExtension.empty()) return false;
+	std::filesystem::path path(filepath);
+	std::string filename = path.filename().string();
+	if (filename.find(excludedExtension) != std::string::npos) 
 		return true;
 	return false;
 }
+
 
 
 std::size_t countTokens(const std::filesystem::path& filepath) {

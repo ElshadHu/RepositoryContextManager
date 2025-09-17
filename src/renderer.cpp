@@ -55,7 +55,9 @@ namespace output {
 				std::cout << "the usage of repoctx [path..] [options]\n"
 					<< "-h --help Show help\n"
 					<< "-v --version Show version\n"
-					<< " -o --output  Write output to file\n";
+					<< " -o --output  Write output to file\n"
+					<< " --include  Include file extensions (*.cpp,*.h)\n"
+					<< " --exclude  Exclude files \n";
 				return true;
 			}
 
