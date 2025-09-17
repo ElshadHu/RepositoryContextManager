@@ -13,10 +13,21 @@ add_executable(repoctx
 
 target_include_directories(repoctx PRIVATE src include)
 
-# Modern vcpkg integration
-find_package(libgit2 CONFIG REQUIRED)
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(LIBGIT2 libgit2)
+endif()
+
+if(LIBGIT2_FOUND)
+    target_link_libraries(repoctx PRIVATE ${LIBGIT2_LIBRARIES})
+    target_include_directories(repoctx PRIVATE ${LIBGIT2_INCLUDE_DIRS})
+else()
+    find_package(libgit2 CONFIG REQUIRED)
 target_link_libraries(repoctx PRIVATE libgit2::libgit2package)
+endif()
 
 if(WIN32)
     target_compile_definitions(repoctx PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
+
+install(TARGETS repoctx RUNTIME DESTINATION bin)

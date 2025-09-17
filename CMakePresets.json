@@ -4,8 +4,11 @@
     {
       "name": "default",
       "binaryDir": "build",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "D:/osdProjects/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
     }
   ]

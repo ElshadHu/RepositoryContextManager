@@ -5,6 +5,7 @@
 #include <string>
 #include <git2.h>
 
+
 namespace fs = std::filesystem;
 namespace gitInfo {
 	//as a container for making clear and simpler
@@ -19,6 +20,7 @@ namespace gitInfo {
 	bool checkRepositoryOpen(const std::string& path, git_repository** repo);
 	bool getHeadReference(git_repository* repo,git_reference**headRef);
 	bool getCommitInfo(git_repository* repo, const git_oid* oid, GitInfo& info);
+
 
 }
 

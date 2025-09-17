@@ -11,8 +11,8 @@
 		".pdb", ".so", ".dylib", ".dll", ".mod", ".smod", ".lai",
 		".la", ".a", ".lib", ".exe", ".out", ".app", ".dwo"
 		};
-		constexpr std::array<std::string_view, 3>ignoredDirs{
-			".vs","build","out"
+		constexpr std::array<std::string_view, 8>ignoredDirs{
+			".vs", "build", "out", ".git", ".github", ".gitignore", ".gitmodules", ".gitattributes"
 		};
 		std::string extension = filePath.extension().string();
 		std::string filename = filePath.filename().string();
@@ -20,6 +20,7 @@
 		//if it finds return it
 		if (std::find(ignoredGit.begin(), ignoredGit.end(), extension) != ignoredGit.end())
 			return true;
+
 		for (const auto& entry : filePath) {
 			std::string dirName = entry.string();
 			if (std::find(ignoredDirs.begin(), ignoredDirs.end(), dirName) != ignoredDirs.end())
@@ -110,8 +111,31 @@ bool excludedExtensions(const std::string& filepath, const std::string& excluded
 	if (excludedExtension.empty()) return false;
 	std::filesystem::path path(filepath);
 	std::string filename = path.filename().string();
-	if (filename.find(excludedExtension) != std::string::npos) 
-		return true;
+	std::string extension = path.extension().string();
+
+	std::stringstream ss(excludedExtension);
+	std::string keyFeature;
+	while (std::getline(ss, keyFeature, ',')) {
+		std::size_t posFirst = keyFeature.find_first_not_of(" \t");
+		std::size_t posLast = keyFeature.find_last_not_of(" \t");
+		if (posFirst != std::string::npos) {
+			keyFeature = keyFeature.substr(posFirst, posLast - posFirst + 1);
+		}
+
+		if (filename.find(keyFeature) != std::string::npos) {
+			return true;
+		}
+
+		if (keyFeature[0] == '.' && extension == keyFeature) {
+			return true;
+		}
+
+		for (const auto& part : path) {
+			if (part.string().find(keyFeature) != std::string::npos) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
