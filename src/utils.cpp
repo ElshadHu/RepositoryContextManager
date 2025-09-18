@@ -5,6 +5,31 @@
 	static std::string m_excludedExtension;
 
 
+
+	bool matchingFileDir(const std::string& path, const std::string& filter) {
+		
+		std::string str = filter;
+		if (filter == "*") 
+			return true;
+
+		if (filter.empty()) 
+			return false;
+
+		if (!str.empty() && str[0] == '*')
+			 str.erase(0, 1);
+		if (!str.empty() && str.back() == '*')
+			str.pop_back();
+		//after trimming if there is nothing match everything because of  *
+		if (str.empty())
+			return false;
+
+		//if it finds true othervise false
+		return path.find(str) != std::string::npos;
+
+
+
+	}
+
 	bool isGitIgnored(const std::filesystem::path& filePath) {
 		constexpr std::array<std::string_view, 22> ignoredGit{
 			".d", ".slo", ".lo", ".o", ".obj", ".gch", ".pch", ".ilk",
@@ -15,7 +40,6 @@
 			".vs", "build", "out", ".git", ".github", ".gitignore", ".gitmodules", ".gitattributes"
 		};
 		std::string extension = filePath.extension().string();
-		std::string filename = filePath.filename().string();
 
 		//if it finds return it
 		if (std::find(ignoredGit.begin(), ignoredGit.end(), extension) != ignoredGit.end())
@@ -37,6 +61,10 @@
 	}
 
 	bool checkingExcludeInclude(const std::filesystem::path& filepath) {
+
+		if (!std::filesystem::exists(filepath))
+			return false;
+
 		if (!m_includedExtension.empty() && !onlyIncludedExtensions(filepath.string(), m_includedExtension)) {
 			return false;
 		}
@@ -47,39 +75,29 @@
 		return true;
 	}
 
-	bool onlyIncludedExtensions(const std::string& filepath,const std::string&includedFiles) {
-		if (filepath.empty()) {
+	bool onlyIncludedExtensions(const std::string& filepath, const std::string& includedFiles) {
+		if (filepath.empty() || !std::filesystem::exists(filepath))
 			return false;
-		}
-		if (includedFiles.empty()) {
+		if (includedFiles.empty())
 			return true;
-		}
-		
+
+		const std::string fullPath = std::filesystem::path(filepath).string();
+
 		std::stringstream ss(includedFiles);
 		std::string str;
-		std::vector<std::string> fileExtensions;
-
 		while (std::getline(ss, str, ',')) {
-			std::size_t posFirst = str.find_first_not_of('\t');
-			std::size_t posLast = str.find_last_not_of('\t');
+			std::size_t posFirst = str.find_first_not_of("\t ");
+			std::size_t posLast = str.find_last_not_of("\t ");
+			if (posFirst == std::string::npos) continue;
+
 			str = str.substr(posFirst, posLast - posFirst + 1);
-			fileExtensions.push_back(str);
-		}
 
-		std::filesystem::path path(filepath);
-		std::string extension = path.extension().string();
-
-		for (auto& included : fileExtensions) {
-			if (included.size()>2 && included[0] == '*') {
-				included = included.substr(1);//remove *
-			}
-			if (included == extension) {
+			if (matchingFileDir(fullPath, str))
 				return true;
-			}
 		}
 		return false;
-
 	}
+
 
  std::filesystem::path findGitRepository(const std::filesystem::path& beginPath) {
 	std::filesystem::path searchingPath = std::filesystem::absolute(beginPath);//we get the absolute path
@@ -107,37 +125,30 @@
 
 
 
-bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension) {
-	if (excludedExtension.empty()) return false;
-	std::filesystem::path path(filepath);
-	std::string filename = path.filename().string();
-	std::string extension = path.extension().string();
+ bool excludedExtensions(const std::string& filepath, const std::string& excludedList) {
+	 if (excludedList.empty()) 
+		 return false;
+	 if (filepath.empty() || !std::filesystem::exists(filepath))
+		 return false;
 
-	std::stringstream ss(excludedExtension);
-	std::string keyFeature;
-	while (std::getline(ss, keyFeature, ',')) {
-		std::size_t posFirst = keyFeature.find_first_not_of(" \t");
-		std::size_t posLast = keyFeature.find_last_not_of(" \t");
-		if (posFirst != std::string::npos) {
-			keyFeature = keyFeature.substr(posFirst, posLast - posFirst + 1);
-		}
+	 const std::string fullPath = std::filesystem::path(filepath).string();
 
-		if (filename.find(keyFeature) != std::string::npos) {
-			return true;
-		}
+	 std::stringstream ss(excludedList);
+	 std::string token;
+	 while (std::getline(ss, token, ',')) {
+		 // trimming
+		 std::size_t posFirst = token.find_first_not_of("\t ");
+		 std::size_t posLast = token.find_last_not_of("\t ");
+		 if (posFirst == std::string::npos) continue;
+		 token = token.substr(posFirst, posLast - posFirst + 1);
+		 if (token.empty()) continue;
 
-		if (keyFeature[0] == '.' && extension == keyFeature) {
-			return true;
-		}
+		 // if any exclude matches  exclude it
+		 if (matchingFileDir(fullPath, token)) return true;
+	 }
+	 return false;
+ }
 
-		for (const auto& part : path) {
-			if (part.string().find(keyFeature) != std::string::npos) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
 
 
 
