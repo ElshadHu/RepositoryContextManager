@@ -14,24 +14,26 @@ add_executable(repoctx
 target_include_directories(repoctx PRIVATE src include)
 
 
+# It tries to find system libgit2 
 find_package(PkgConfig QUIET)
 if(PkgConfig_FOUND)
     pkg_check_modules(LIBGIT2 libgit2)
 endif()
 
 if(LIBGIT2_FOUND)
-    # Use system packages
+    # Use libgit2 which is system-installed
     target_link_libraries(repoctx ${LIBGIT2_LIBRARIES})
     target_include_directories(repoctx PRIVATE ${LIBGIT2_INCLUDE_DIRS})
     target_compile_options(repoctx PRIVATE ${LIBGIT2_CFLAGS_OTHER})
     message(STATUS "Using system libgit2")
 else()
-
+#  Go back to vcpkg libgit2(typical for Windows)
     find_package(libgit2 CONFIG REQUIRED)
     target_link_libraries(repoctx libgit2::libgit2package)
     message(STATUS "Using vcpkg libgit2")
 endif()
 
+# Windows related compiler stuff
 if(WIN32)
     target_compile_definitions(repoctx PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
