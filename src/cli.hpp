@@ -9,6 +9,7 @@ namespace cli {
 	struct Options {
 		bool showHelp = false;
 		bool showVersion = false;
+		bool recent = false; // new
 		std::string outputFile;
 		std::vector<std::string_view>inputFiles; //for getting more than one file and  getting total inputs
 		std::string fileExtension;

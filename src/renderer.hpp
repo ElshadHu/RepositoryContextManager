@@ -7,6 +7,7 @@
 #include "cli.hpp"
 #include "git_info.hpp"
 #include "fs_travel.hpp"
+#include "utils.hpp"
 
 namespace output {
 	//output target

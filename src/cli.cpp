@@ -35,6 +35,11 @@ namespace cli {
 			else if (argument == "--exclude" && i + 1 < argc) {
 				options.excludePattern = argv[++i];
 			}
+			
+			// new:
+			else if ((argument == "-r" || argument == "--recent") && i + 1 < argc) {
+				options.recent = true;
+			}
 
 			else {
 				options.inputFiles.push_back(argument);

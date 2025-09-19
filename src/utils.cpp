@@ -3,7 +3,7 @@
 	//we are gonna initialize these variable and during the execution we will check
 	static  std::string m_includedExtension;
 	static std::string m_excludedExtension;
-
+	static bool m_recentOnly = false; // new
 
 
 	bool matchingFileDir(const std::string& path, const std::string& filter) {
@@ -55,10 +55,12 @@
 
 	}
 
-	void setFiltering(const std::string& include, const std::string& exclude) {
+	void setFiltering(const std::string& include, const std::string& exclude, bool recent = false) {
 		m_includedExtension = include;
 		m_excludedExtension = exclude;
+		m_recentOnly = recent; //new
 	}
+
 
 	bool checkingExcludeInclude(const std::filesystem::path& filepath) {
 
@@ -69,6 +71,10 @@
 			return false;
 		}
 		if (!m_excludedExtension.empty() && excludedExtensions(filepath.string(), m_excludedExtension)) {
+			return false;
+		}
+		//new:
+		if (m_recentOnly && !isRecentlyModified(filepath)) {
 			return false;
 		}
 
@@ -227,3 +233,29 @@ const std::string getLanguageExtension(const std::string& ext) {
 	}
 	return "text";
 }
+
+// new:
+bool isRecentlyModified(const std::filesystem::path& filepath, int days) {
+    if (!std::filesystem::exists(filepath)) {
+        return false;
+    }
+
+    try {
+        auto lastWriteTime = std::filesystem::last_write_time(filepath);
+
+        // Convert to system clock time_point
+        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+            lastWriteTime - std::filesystem::file_time_type::clock::now()
+            + std::chrono::system_clock::now()
+        );
+
+        auto now = std::chrono::system_clock::now();
+        auto age = std::chrono::duration_cast<std::chrono::hours>(now - sctp).count() / 24;
+
+        return age <= days;
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error checking file timestamp: " << filepath << " (" << e.what() << ")\n";
+        return false;
+    }
+}
+

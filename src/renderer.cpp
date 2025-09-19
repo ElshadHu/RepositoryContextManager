@@ -39,7 +39,8 @@ namespace output {
 					<< "-v --version Show version\n"
 					<< " -o --output  Write output to file\n"
 					<< " --include  Include file extensions (*.cpp,*.h)\n"
-					<< " --exclude  Exclude files \n";
+					<< " --exclude  Exclude files \n"
+					<< " -r --recent  Show recently modified files \n"; //new
 				return true;
 			}
 
@@ -108,6 +109,37 @@ namespace output {
 				writeGitInfo(o, absolute);
 				//write file structure
 				writeFileStructure(o, absolute);
+
+				// Recent Changes Section
+                if (opt.recent) {
+                    o << "## Recent Changes (last 7 days)\n\n";
+
+                    std::error_code errCode;
+                    for (auto const& entry : std::filesystem::recursive_directory_iterator(absolute, errCode)) {
+                        if (errCode) {
+                            std::cerr << "Error accessing " << entry.path() << ": " << errCode.message() << '\n';
+                            errCode.clear();
+                            continue;
+                        }
+
+                        if (entry.is_regular_file() && checkingExcludeInclude(entry.path()) &&
+                            isRecentlyModified(entry.path())) {
+
+                            auto ftime = std::filesystem::last_write_time(entry.path());
+                            auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                                ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
+                            );
+                            auto age = std::chrono::duration_cast<std::chrono::hours>(
+                                std::chrono::system_clock::now() - sctp
+                            ).count() / 24;
+
+                            o << "- " << std::filesystem::relative(entry.path(), absolute).string()
+                              << " (" << age << " days ago)\n";
+                        }
+                    }
+                    o << "\n";
+                }
+
 				 auto  statistics = writeFileContents(o, absolute);
 				 o << "## Summary\n";
 				 o << "- Total Files: " << statistics.m_totalFiles << '\n';
