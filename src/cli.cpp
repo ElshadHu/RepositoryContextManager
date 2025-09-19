@@ -36,14 +36,6 @@ namespace cli {
 				options.excludePattern = argv[++i];
 			}
 
-			else if (argument == "--format" && i + 1 < argc) {
-				options.outputFormat = argv[++i];
-			}
-
-			else if (argument == "--max-file-size" && i + 1 < argc) {
-				options.maxFileSize = argv[++i];
-			}
-
 			else {
 				options.inputFiles.push_back(argument);
 			}

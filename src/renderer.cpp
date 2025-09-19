@@ -2,6 +2,7 @@
 
 namespace output {
 
+	//if filename is empty target the console otherwise write to the file
 	std::ostream& targetOut(std::ofstream& file, const std::string& filename) {
 		if (filename.empty())
 			return std::cout;
@@ -12,25 +13,6 @@ namespace output {
 
 	}
 
-
-	static std::filesystem::path findGitRepository(const std::filesystem::path& beginPath) {
-		std::filesystem::path searchingPath = std::filesystem::absolute(beginPath);//we get the absolute path
-		//if it exists it will return  this path  that is the first check
-		//later when we create the parentPath  and will change the path and gets the parent directory until it finds or path becomes same . if it does not find C:/ = C:/ break it and return empty {}
-		while (!searchingPath.empty()) {
-			if (std::filesystem::exists(searchingPath / ".git")) {
-				return searchingPath;
-			}
-
-			auto parentPath = searchingPath.parent_path();
-			if (parentPath == searchingPath) {
-				break;
-			}
-			searchingPath = parentPath;
-		}
-		//if did not find return empty path
-		return std::filesystem::path{};
-	}
 
 	void writeGitInfo(std::ostream& o, const std::filesystem::path& absolute) {
 		o << "### GIT INFO \n\n";
@@ -72,11 +54,12 @@ namespace output {
 	}
 
 
-
+	//Capturing cout output original_out is the pointer to the ofstream object  it saves the current cout destination
+	//  then caughtOut is created for accepting the temporary  string buffer
+	//later we redirect the cout to the current cout destination
+	// rdbuf is useful for redirecting the code without changing the code 
 	void writeFileStructure(std::ostream& o, const std::filesystem::path& path) {
 		o << "Structure\n\n";
-
-		//Capturing cout output
 		std::streambuf* original_out = std::cout.rdbuf();
 		std::ostringstream caughtOut;
 		std::cout.rdbuf(caughtOut.rdbuf());
@@ -112,16 +95,18 @@ namespace output {
 	void renderRepositoryContext(const std::string& filename, const cli::Options& opt) {
 		try {
 			std::ofstream fileOutput;
+
 			std::ostream& o = targetOut(fileOutput, filename);
 			for (const auto& input : opt.inputFiles) {
 				const auto absolute = std::filesystem::absolute(input);
-				o << "# Repository Context\n\n";
 				o << "## File System Location\n\n" << absolute.string() << "\n\n";
 				if (!std::filesystem::exists(absolute)) {
 					std::cerr << "Error: Path does not exist: " << absolute << std::endl;
 					continue;
 				}
+				//write git repo information
 				writeGitInfo(o, absolute);
+				//write file structure
 				writeFileStructure(o, absolute);
 				 auto  statistics = writeFileContents(o, absolute);
 				 o << "## Summary\n";

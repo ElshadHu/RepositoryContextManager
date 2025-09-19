@@ -8,6 +8,7 @@ Command-line tool that analyzes  local git repositories and creates a text file 
 - **Error Handling** - Gracefully handles permission errors and inaccessible files
 - **File Size Management** - Automatically truncates large files (>16KB) with truncation notices
 - **Flexible Input** - Supports analyzing directories, individual files, or combinations
+- **Include/Exclude Feature** Supports including or excluding specific folders or files
 
 # Prerequisites
 - CMake 3.20 or higher
@@ -21,21 +22,28 @@ Command-line tool that analyzes  local git repositories and creates a text file 
 ```bash
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
-./bootstrap-vcpkg.bat  
-set VCPKG_ROOT=%CD%
-# Install libgit2
-```
-# Install libgit2
-```bash
-.\vcpkg install libgit2
+.\bootstrap-vcpkg.bat
+$env:VCPKG_ROOT = $PWD
+
+# Install libgit2 for Windows x64
+.\vcpkg install libgit2:x64-windows
 ```
 # 2. Build the project
 ## Clone this repository
 ```bash
 git clone https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
-cmake -B build -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake"
-cmake --build build --config Release
+# Method 1: Using environment variable (recommended)
+cmake -B build -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
+cmake --build build
+
+# Method 2: Direct path (if vcpkg is in parent directory)
+cmake -B build -DCMAKE_TOOLCHAIN_FILE="..\vcpkg\scripts\buildsystems\vcpkg.cmake"
+cmake --build build
+
+# Method 3: Without specifying toolchain (if vcpkg is configured globally)
+cmake -B build
+cmake --build build
 ```
 # Linux
 ```bash
@@ -97,7 +105,7 @@ repoctx --version
 repoctx . --include "*.cpp,*.hpp,*.h" --exclude "test,build" --output cpp-analysis.md
 
 # Analyze multiple directories
-repoctx src docs examples
+repoctx src docs 
 
 # Mix files and directories
 repoctx src README.md CMakeLists.txt --output project-overview.md
@@ -116,39 +124,58 @@ repoctx src README.md CMakeLists.txt --output project-overview.md
 
 # Output Format 
 ```markdown
+PS D:\osdProjects\RepositoryContextPackager> .\build\repoctx.exe .
 # Repository Context
 
 ## File System Location
-/absolute/path/to/analyzed/location
+
+D:\osdProjects\RepositoryContextPackager
 
 ### GIT INFO
-- Commit: e45f8911e2ca40223faf2309bf1996443f2df336
+
+- Commit: 4e96146d00cc70854c98e70caf5cf597553daca2
 - Branch: main
-- Author: Your Name <your.email@example.com>
-- Date: Thu Sep 12 16:07:19 2025
+- Author: Elshad Humbatli< elsadhumbetli079@gmail.com >
+- Date: Thu Sep 18 02:30:16 2025
 
-## Structure
-include/
-utils.hpp
-src/
-   main.cpp
-   cli.cpp
-   cli.hpp
+Structure
+
 CMakeLists.txt
-```
-### File: src/main.cpp
+CMakeSettings.json
+\include
+    utils.hpp
+LICENSE
+README.md
+\src
+    cli.cpp
+    cli.hpp
+    fs_travel.cpp
+    fs_travel.hpp
+    git_info.cpp
+    git_info.hpp
+    main.cpp
+    renderer.cpp
+    renderer.hpp
+    utils.cpp
+vcpkg.json
 
-```cpp
-#include <iostream>
-int main() {
-    std::cout << "Hi There!" << std::endl;
-    return 0;
-}
 
-Total Files: 15
+
+### File:"CMakeLists.txt"
+``` text
+cmake_minimum_required(VERSION 3.20)
+project(repoctx VERSION 0.1.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  additional data is shown about files ...
+
+  --  At the end file data
+  Total Files: 15
 Total Lines: 1,247
 Total Tokens: 4,532
+
 ```
+
 
 # Testing from Source
 
@@ -166,23 +193,27 @@ cmake --build build --config Release
 
 ## Project Structure
 ``` bash
-RepositoryContextPackager/
-├── include/
-│   └── utils.hpp         # Utility function declarations
-├── src/
-│   ├── main.cpp          # Main entry point
-│   ├── cli.cpp           # Command-line argument parsing
-│   ├── cli.hpp           # CLI parsing declarations
-│   ├── fs_travel.cpp     # File system traversal
-│   ├── fs_travel.hpp     # File system traversal declarations
-│   ├── git_info.cpp      # Git repository information
-│   ├── git_info.hpp      # Git info declarations
-│   ├── renderer.cpp      # Output rendering
-│   ├── renderer.hpp      # Renderer declarations
-│   └── utils.cpp         # Utility functions
-├── CMakeLists.txt        # Build configuration
-├── vcpkg.json           # Dependencies
-└── README.md            # This file           
+osdProjects/ # that is a local development directory
+├── vcpkg/                          # C++ package manager
+|     ├── scripts/buildsystems/vcpkg.cmake
+│     └── [vcpkg installation files...] 
+└── RepositoryContextPackager/      # This project
+    ├── include/
+    │   └── utils.hpp         # Utility function declarations
+    ├── src/
+    │   ├── main.cpp          # Main entry point
+    │   ├── cli.cpp           # Command-line argument parsing
+    │   ├── cli.hpp           # CLI parsing declarations
+    │   ├── fs_travel.cpp     # File system traversal
+    │   ├── fs_travel.hpp     # File system traversal declarations
+    │   ├── git_info.cpp      # Git repository information
+    │   ├── git_info.hpp      # Git info declarations
+    │   ├── renderer.cpp      # Output rendering
+    │   ├── renderer.hpp      # Renderer declarations
+    │   └── utils.cpp         # Utility functions
+    ├── CMakeLists.txt        # Build configuration
+    ├── vcpkg.json           # Dependencies
+    └── README.md            # README file            
 ```
 # Contributing
 - Fork the repository

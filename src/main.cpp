@@ -10,6 +10,7 @@ int main(int argc, char**argv) {
     try {
         cli::Options opt = cli::parse(argc, argv);
 
+           // checking filters via static variables 
         setFiltering(opt.fileExtension, opt.excludePattern);
 
         if (output::writeCliCommands(opt)) {
