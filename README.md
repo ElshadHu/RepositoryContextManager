@@ -92,6 +92,9 @@ repoctx . --include "*.cpp,*.h,*.py"
 # Exclude certain patterns
 repoctx . --exclude "test,build,node_modules"
 
+# Only package files modified in the last 7 days
+repoctx . --recent
+
 # Show help
 repoctx --help
 
@@ -109,6 +112,9 @@ repoctx src docs
 
 # Mix files and directories
 repoctx src README.md CMakeLists.txt --output project-overview.md
+
+# Combination of different flags
+repoctx ./src --recent --exclude "README.md" --output recently-updated-files.md
 ```
 
 # Command Line Options
@@ -119,7 +125,7 @@ repoctx src README.md CMakeLists.txt --output project-overview.md
 | `--output`, `-o`  | Output file path                   | `repoctx -o report.md`           |
 | `--include`       | Include file extensions            | `--include "*.cpp,*.h"`           |
 | `--exclude`       | Exclude file patterns               | `--exclude "test,build"`          |
-
+| `--recent`       | Show files modified in the last 7 days | `repoctx . -r`          |
 
 
 # Output Format 
