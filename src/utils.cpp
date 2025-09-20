@@ -3,7 +3,6 @@
 	//we are gonna initialize these variable and during the execution we will check
 	static  std::string m_includedExtension;
 	static std::string m_excludedExtension;
-	static bool m_recentOnly = false; // new
 
 
 	bool matchingFileDir(const std::string& path, const std::string& filter) {
