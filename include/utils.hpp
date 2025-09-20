@@ -20,3 +20,5 @@ void setFiltering(const std::string& include, const std::string& exclude, bool r
  bool isGitIgnored(const std::filesystem::path& filePath);
  bool matchingFileDir(const std::string& path, const std::string& filter);
  bool isRecentlyModified(const std::filesystem::path& filePath, int days = 7); // new
+
+ static bool m_recentOnly = false; // new
