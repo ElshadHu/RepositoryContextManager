@@ -11,7 +11,7 @@ int main(int argc, char**argv) {
         cli::Options opt = cli::parse(argc, argv);
 
            // checking filters via static variables 
-        setFiltering(opt.fileExtension, opt.excludePattern);
+        setFiltering(opt.fileExtension, opt.excludePattern, opt.recent);
 
         if (output::writeCliCommands(opt)) {
             return 0;

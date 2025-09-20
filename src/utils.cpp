@@ -55,7 +55,7 @@
 
 	}
 
-	void setFiltering(const std::string& include, const std::string& exclude, bool recent = false) {
+	void setFiltering(const std::string& include, const std::string& exclude,bool recent) {
 		m_includedExtension = include;
 		m_excludedExtension = exclude;
 		m_recentOnly = recent; //new

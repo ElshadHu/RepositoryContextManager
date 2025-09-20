@@ -37,7 +37,7 @@ namespace cli {
 			}
 			
 			// new:
-			else if ((argument == "-r" || argument == "--recent") && i + 1 < argc) {
+			else if (argument == "-r" || argument == "--recent") {
 				options.recent = true;
 			}
 

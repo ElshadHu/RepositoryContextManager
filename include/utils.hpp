@@ -9,7 +9,7 @@
 #include <sstream>
 #include <chrono>
 
-void setFiltering(const std::string& include, const std::string& exclude);
+void setFiltering(const std::string& include, const std::string& exclude, bool recent);
  bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension);
  bool checkingExcludeInclude(const std::filesystem::path& filepath);
  const std::string getLanguageExtension(const std::string& ext);
