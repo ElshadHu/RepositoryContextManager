@@ -8,16 +8,15 @@
 
 int main(int argc, char**argv) {
     try {
-        cli::Options opt = cli::parse(argc, argv);
+        cli::Options opt;
 
-           // checking filters via static variables 
-        setFiltering(opt.fileExtension, opt.excludePattern, opt.recent);
+
+         opt = cli::parse(argc, argv);
+
 
         if (output::writeCliCommands(opt)) {
             return 0;
         }
-
-        // Parse command line arguments
         output::renderRepositoryContext(opt.outputFile, opt);
 
     }

@@ -1,9 +1,49 @@
 #include "utils.hpp"
 
 	//we are gonna initialize these variable and during the execution we will check
-	static  std::string m_includedExtension;
-	static std::string m_excludedExtension;
+	//static  std::string m_includedExtension;
+	//static std::string m_excludedExtension;
 
+
+
+
+bool isGitIgnored(const std::filesystem::path& filePath) {
+	std::string pathStr = filePath.string();
+	std::string filename = filePath.filename().string();
+	std::string extension = filePath.extension().string();
+
+	// Convert to forward slashes for consistent matching
+	std::replace(pathStr.begin(), pathStr.end(), '\\', '/');
+
+	if (!filename.empty() && filename[0] == '.' && filename != ".gitignore") {
+		return true;
+	}
+	constexpr std::array<std::string_view, 22> ignoredGit{
+			".d", ".slo", ".lo", ".o", ".obj", ".gch", ".pch", ".ilk",
+		".pdb", ".so", ".dylib", ".dll", ".mod", ".smod", ".lai",
+		".la", ".a", ".lib", ".exe", ".out", ".app", ".dwo"
+	};
+	constexpr std::array<std::string_view, 8>ignoredDirs{
+		".vs", "build", "out", ".git", ".github", ".gitignore", ".gitmodules", ".gitattributes"
+	};
+
+	for (const auto& ext : ignoredGit) {
+		if (extension == ext) return true;
+	}
+	std::istringstream pathStream(pathStr);
+	std::string component;
+	while (std::getline(pathStream, component, '/')) {
+		if (!component.empty()) {
+			// Checking exact matches
+			for (const auto& ignored : ignoredDirs) {
+				if (component == ignored) return true;
+			}
+			if (component.find("build") != std::string::npos) return true;
+		}
+	}
+
+	return false;
+}
 
 	bool matchingFileDir(const std::string& path, const std::string& filter) {
 		
@@ -24,61 +64,35 @@
 
 		//if it finds true othervise false
 		return path.find(str) != std::string::npos;
-
-
-
-	}
-
-	bool isGitIgnored(const std::filesystem::path& filePath) {
-		constexpr std::array<std::string_view, 22> ignoredGit{
-			".d", ".slo", ".lo", ".o", ".obj", ".gch", ".pch", ".ilk",
-		".pdb", ".so", ".dylib", ".dll", ".mod", ".smod", ".lai",
-		".la", ".a", ".lib", ".exe", ".out", ".app", ".dwo"
-		};
-		constexpr std::array<std::string_view, 8>ignoredDirs{
-			".vs", "build", "out", ".git", ".github", ".gitignore", ".gitmodules", ".gitattributes"
-		};
-		std::string extension = filePath.extension().string();
-
-		//if it finds return it
-		if (std::find(ignoredGit.begin(), ignoredGit.end(), extension) != ignoredGit.end())
-			return true;
-
-		for (const auto& entry : filePath) {
-			std::string dirName = entry.string();
-			if (std::find(ignoredDirs.begin(), ignoredDirs.end(), dirName) != ignoredDirs.end())
-				return true;
-		}
-
-		return false;
-
-	}
-
-	void setFiltering(const std::string& include, const std::string& exclude,bool recent) {
-		m_includedExtension = include;
-		m_excludedExtension = exclude;
-		m_recentOnly = recent; //new
 	}
 
 
-	bool checkingExcludeInclude(const std::filesystem::path& filepath) {
-
-		if (!std::filesystem::exists(filepath))
-			return false;
-
-		if (!m_includedExtension.empty() && !onlyIncludedExtensions(filepath.string(), m_includedExtension)) {
-			return false;
-		}
-		if (!m_excludedExtension.empty() && excludedExtensions(filepath.string(), m_excludedExtension)) {
-			return false;
-		}
-		//new:
-		if (m_recentOnly && !isRecentlyModified(filepath)) {
+	bool isRecentlyModified(const std::filesystem::path& filepath, int days) {
+		if (!std::filesystem::exists(filepath)) {
 			return false;
 		}
 
-		return true;
+		try {
+			auto lastWriteTime = std::filesystem::last_write_time(filepath);
+
+			// Convert to system clock time_point
+			auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+				lastWriteTime - std::filesystem::file_time_type::clock::now()
+				+ std::chrono::system_clock::now()
+			);
+
+			auto now = std::chrono::system_clock::now();
+			auto age = std::chrono::duration_cast<std::chrono::hours>(now - sctp).count() / 24;
+
+			return age <= days;
+		}
+		catch (const std::filesystem::filesystem_error& e) {
+			std::cerr << "Error checking file timestamp: " << filepath << " (" << e.what() << ")\n";
+			return false;
+		}
 	}
+
+
 
 	bool onlyIncludedExtensions(const std::string& filepath, const std::string& includedFiles) {
 		if (filepath.empty() || !std::filesystem::exists(filepath))
@@ -233,28 +247,33 @@ const std::string getLanguageExtension(const std::string& ext) {
 	return "text";
 }
 
-// new:
-bool isRecentlyModified(const std::filesystem::path& filepath, int days) {
-    if (!std::filesystem::exists(filepath)) {
-        return false;
-    }
 
-    try {
-        auto lastWriteTime = std::filesystem::last_write_time(filepath);
 
-        // Convert to system clock time_point
-        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-            lastWriteTime - std::filesystem::file_time_type::clock::now()
-            + std::chrono::system_clock::now()
-        );
+void readDisplayFile(const std::filesystem::path& filepath) {
 
-        auto now = std::chrono::system_clock::now();
-        auto age = std::chrono::duration_cast<std::chrono::hours>(now - sctp).count() / 24;
+	std::ifstream file(filepath);
+	if (!file.is_open()) {
+		std::cerr << "cannot open file: " << filepath << '\n';
+		return;
+	}
 
-        return age <= days;
-    } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Error checking file timestamp: " << filepath << " (" << e.what() << ")\n";
-        return false;
-    }
+	std::cout << "\n### File:" << std::filesystem::relative(filepath) << '\n';
+	std::string format = filepath.extension().string();
+	std::cout << "``` " << getLanguageExtension(format) << '\n';
+	int bytes = 0;
+	std::string str;
+	bool truncated = false;
+	while (std::getline(file, str)) {
+		if (bytes + str.length() > SIZEOFFILE) {
+			truncated = true;
+			break;
+		}
+		std::cout << str << '\n';
+		bytes += str.length() + 1;//for newline
+	}
+	if (truncated) {
+		std::cout << "\n.. [File truncated - exceeded " << SIZEOFFILE << " bytes\n";
+	}
+	std::cout << "```" << '\n';
 }
 

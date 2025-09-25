@@ -8,6 +8,7 @@
 #include "git_info.hpp"
 #include "fs_travel.hpp"
 #include "utils.hpp"
+#include "filter.hpp"
 
 namespace output {
 	//output target
@@ -16,6 +17,6 @@ namespace output {
 	bool writeCliCommands(const cli::Options& opt);
 	void renderRepositoryContext(const std::string& filename,const cli::Options&opt);
 	void writeFileStructure(std::ostream& o, const std::filesystem::path& path);
-	fsTravel::TotalStatistics writeFileContents(std::ostream& o, const std::filesystem::path& path);
+	void writeFileContents(std::ostream& o, const std::filesystem::path& path,const cli::Options&opt);
 
 }

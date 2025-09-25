@@ -77,19 +77,32 @@ namespace output {
 
 	
 
-	fsTravel::TotalStatistics writeFileContents(std::ostream& o, const std::filesystem::path& path) {
+	void writeFileContents(std::ostream& o, const std::filesystem::path& path,const cli::Options& opt) {
 		//capturing the output
 
 		std::streambuf* original_out = std::cout.rdbuf();
 		std::ostringstream caughtOut;
 		std::cout.rdbuf(caughtOut.rdbuf());
-		//calling the function
-		auto statistics = fsTravel::travelFileContents(path);
-		std::cout.rdbuf(original_out);
+		
+		Filter::FilterManager filter(opt);
 
+		std::error_code err;
+
+		if (std::filesystem::is_regular_file(path) && filter.checkingExcludeInclude(path)) {
+			fsTravel::travelFileContents(path);
+		}
+		else if (std::filesystem::is_directory(path)) {
+			for (const auto& entry : std::filesystem::recursive_directory_iterator(path, err)) {
+				if (err) continue;
+				if (entry.is_regular_file() && filter.checkingExcludeInclude(entry.path())) {
+					readDisplayFile(entry.path());
+				}
+			}
+		}
+
+		std::cout.rdbuf(original_out);
 		o << caughtOut.str();
 		o << '\n';
-		return statistics;
 	}
 
 
@@ -105,46 +118,9 @@ namespace output {
 					std::cerr << "Error: Path does not exist: " << absolute << std::endl;
 					continue;
 				}
-				//write git repo information
 				writeGitInfo(o, absolute);
-				//write file structure
 				writeFileStructure(o, absolute);
-
-				// Recent Changes Section
-                if (opt.recent) {
-                    o << "## Recent Changes (last 7 days)\n\n";
-
-                    std::error_code errCode;
-                    for (auto const& entry : std::filesystem::recursive_directory_iterator(absolute, errCode)) {
-                        if (errCode) {
-                            std::cerr << "Error accessing " << entry.path() << ": " << errCode.message() << '\n';
-                            errCode.clear();
-                            continue;
-                        }
-
-                        if (entry.is_regular_file() && checkingExcludeInclude(entry.path()) &&
-                            isRecentlyModified(entry.path())) {
-
-                            auto ftime = std::filesystem::last_write_time(entry.path());
-                            auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-                                ftime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
-                            );
-                            auto age = std::chrono::duration_cast<std::chrono::hours>(
-                                std::chrono::system_clock::now() - sctp
-                            ).count() / 24;
-
-                            o << "- " << std::filesystem::relative(entry.path(), absolute).string()
-                              << " (" << age << " days ago)\n";
-                        }
-                    }
-                    o << "\n";
-                }
-
-				 auto  statistics = writeFileContents(o, absolute);
-				 o << "## Summary\n";
-				 o << "- Total Files: " << statistics.m_totalFiles << '\n';
-				 o << "- Total Lines: " << statistics.m_totalLines << '\n';
-				 o << "- Total tokens: " << statistics.m_totalTokens << '\n';
+				 writeFileContents(o, absolute,opt);
 			}
 
 		}

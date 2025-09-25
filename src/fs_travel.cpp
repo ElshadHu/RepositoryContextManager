@@ -29,7 +29,7 @@ namespace fsTravel {
 
 		try {
 
-				if (fs::is_regular_file(pathToAnalyze) && !isGitIgnored(pathToAnalyze)) {
+				if (fs::is_regular_file(pathToAnalyze)) {
 					travelSingleFile(pathToAnalyze);
 					return;
 				}
@@ -40,17 +40,22 @@ namespace fsTravel {
 					errCode.clear();
 					continue;
 				}
+
+				if (isGitIgnored(entry.path())) {
+					continue;
+				}
+
 				const auto fileOrDir = entry.path().filename().string();
 
 				
 				
 				// Process directories recursively
-				if (entry.is_directory() && !isGitIgnored(entry.path())) {
+				if (entry.is_directory()) {
 					std::cout << indent(depth)<< "/" << fileOrDir << '\n';
 						travelDirTree(entry.path(), depth + 1);	
 				}
 				//Display regular files in the structure
-				else if (entry.is_regular_file() && !isGitIgnored(entry.path())) {
+				else if (entry.is_regular_file()) {
 					const auto extension = entry.path().extension().string();
 						std::cout <<indent(depth) << fileOrDir << "\n";
 				}
@@ -74,22 +79,13 @@ namespace fsTravel {
 		 TotalStatistics containing file count, line count, and token count
 		*/
 
-	TotalStatistics travelFileContents(const fs::path& pathToAnalyze) {
-		TotalStatistics totals{ 0,0,0 };
+	void travelFileContents(const fs::path& pathToAnalyze) {
+	/*	TotalStatistics totals{ 0,0,0 };*/
 		std::error_code errCode;
 		try {
-			if (isGitIgnored(pathToAnalyze)) {
-				return TotalStatistics{ 0, 0, 0 };
-			}
-			//we are able to check via checkincludeExclude whether we need to exclude or include
-			if (fs::is_regular_file(pathToAnalyze) && checkingExcludeInclude(pathToAnalyze) && !isGitIgnored(pathToAnalyze)) {
 			
-					totals.m_totalFiles = 1;
-					totals.m_totalLines = countLines(pathToAnalyze);
-					totals.m_totalTokens = countTokens(pathToAnalyze);
-
+			if (fs::is_regular_file(pathToAnalyze) && !isGitIgnored(pathToAnalyze)) {
 					readDisplayFile(pathToAnalyze);
-				return totals;
 			}
 
 			for (auto const& entry : fs::recursive_directory_iterator(pathToAnalyze, errCode)) {
@@ -99,13 +95,8 @@ namespace fsTravel {
 					continue;
 				}
 
-				
-		
-				if (entry.is_regular_file() && checkingExcludeInclude(entry.path()) && !isGitIgnored(entry.path())) {
+				if (entry.is_regular_file() && !isGitIgnored(entry.path())) {
 					const auto extension = entry.path().extension().string();
-						++totals.m_totalFiles;
-						totals.m_totalLines += countLines(entry.path());
-						totals.m_totalTokens += countTokens(entry.path());
 						readDisplayFile(entry.path()); //every time calls the files via the help of recursion
 				}
 			}
@@ -113,36 +104,9 @@ namespace fsTravel {
 		catch (const fs::filesystem_error& ex) {
 			std::cerr << "Filesystem error: " << ex.what() << '\n';
 		}
-		return totals;
 	}
 
 
-	void readDisplayFile(const fs::path& filepath) {
-
-		std::ifstream file(filepath);
-		if (!file.is_open()) {
-			std::cerr << "cannot open file: " << filepath << '\n';
-			return;
-		}
-
-		std::cout << "\n### File:" << fs::relative(filepath) << '\n';
-		std::string format = filepath.extension().string();
-		std::cout << "``` " << getLanguageExtension(format) << '\n';
-		int bytes = 0;
-		std::string str;
-		bool truncated = false;
-		while (std::getline(file, str)) {
-			if (bytes + str.length() > SIZEOFFILE) {
-				truncated = true;
-				break;
-			}
-			std::cout << str << '\n';
-			bytes += str.length() + 1;//for newline
-		}
-		if (truncated) {
-			std::cout << "\n.. [File truncated - exceeded " << SIZEOFFILE << " bytes\n";
-		}
-		std::cout <<"```" << '\n';
-	}
+	
 
 }

@@ -11,7 +11,8 @@ add_executable(repoctx
     src/fs_travel.cpp
     src/git_info.cpp
     src/renderer.cpp
-    src/utils.cpp)
+    src/utils.cpp
+    src/filter.cpp )
 
 target_include_directories(repoctx PRIVATE src include)
 

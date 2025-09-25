@@ -8,17 +8,20 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include "cli.hpp"
 
-void setFiltering(const std::string& include, const std::string& exclude, bool recent);
+#define SIZEOFFILE 16234
+
+bool isRecentlyModified(const std::filesystem::path& filepath, int days = 7);
+bool isGitIgnored(const std::filesystem::path& filePath) ;
  bool excludedExtensions(const std::string& filepath, const std::string& excludedExtension);
- bool checkingExcludeInclude(const std::filesystem::path& filepath);
  const std::string getLanguageExtension(const std::string& ext);
  std::filesystem::path findGitRepository(const std::filesystem::path& beginPath);
  std::size_t countLines(const std::filesystem::path& filepath);
  std::size_t countTokens(const std::filesystem::path& filePath);
  bool onlyIncludedExtensions(const std::string& extension,const std::string&includedFiles);
- bool isGitIgnored(const std::filesystem::path& filePath);
  bool matchingFileDir(const std::string& path, const std::string& filter);
- bool isRecentlyModified(const std::filesystem::path& filePath, int days = 7); // new
+ void readDisplayFile(const std::filesystem::path& filepath);
+
 
  static bool m_recentOnly = false; // new

@@ -29,16 +29,28 @@ namespace cli {
 			}
 
 			else if (argument == "--include" && i + 1 < argc) {
-				options.fileExtension = argv[++i];
+				options.includePattern = argv[++i];
+
+				std::string pattern = options.includePattern;
+				options.onIncludeFilter = [pattern](const std::filesystem::path& path) {
+					return  onlyIncludedExtensions(path.string(), pattern);
+					};
 			}
 
 			else if (argument == "--exclude" && i + 1 < argc) {
 				options.excludePattern = argv[++i];
+				std::string pattern = options.excludePattern;
+				options.onExcludeFilter = [pattern](const std::filesystem::path& path) {
+					return excludedExtensions(path.string(), pattern);
+					};
 			}
 			
 			// new:
 			else if (argument == "-r" || argument == "--recent") {
 				options.recent = true;
+				options.onRecentFilter = [](const std::filesystem::path& path) {
+					return isRecentlyModified(path);
+					};
 			}
 
 			else {
