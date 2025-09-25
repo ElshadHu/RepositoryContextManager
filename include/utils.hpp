@@ -25,4 +25,3 @@ bool isGitIgnored(const std::filesystem::path& filePath) ;
  std::uintmax_t getFileSize(const std::filesystem::path& filepath); // new feature actual tpye is uintmax which is better to write in the return type for avoiding implicit conversion
 
 
- static bool m_recentOnly = false; // new
