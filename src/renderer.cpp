@@ -75,6 +75,34 @@ namespace output {
 
 	}
 
+	void writeFileStatistics(std::ostream& o, const std::filesystem::path& path, const cli::Options& opt) {
+		Filter::FilterManager filter(opt);
+		std::size_t totalLines = 0;
+		std::size_t totalFiles = 0;
+
+		std::error_code err;
+
+		if (std::filesystem::is_regular_file(path) && filter.checkingExcludeInclude(path)) {
+			totalFiles += 1;
+			totalLines += countLines(path);
+		}
+
+		else if (std::filesystem::is_directory(path)) {
+			for (const auto& entry : std::filesystem::recursive_directory_iterator(path, err)) {
+		
+				if (err) continue;
+				if (entry.is_regular_file() && filter.checkingExcludeInclude(entry.path())) {
+					totalFiles += 1;
+					totalLines += countLines(entry.path());
+				}
+			}
+		}
+
+		o << "### Statistics\n";
+		o << "Total Files: " << totalFiles << '\n';
+		o << "Total Lines: " << totalLines << '\n';
+
+	}
 	
 
 	void writeFileContents(std::ostream& o, const std::filesystem::path& path,const cli::Options& opt) {
@@ -121,6 +149,7 @@ namespace output {
 				writeGitInfo(o, absolute);
 				writeFileStructure(o, absolute);
 				 writeFileContents(o, absolute,opt);
+				 writeFileStatistics(o, absolute, opt);
 			}
 
 		}

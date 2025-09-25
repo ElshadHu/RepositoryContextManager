@@ -24,4 +24,3 @@ bool isGitIgnored(const std::filesystem::path& filePath) ;
  void readDisplayFile(const std::filesystem::path& filepath);
 
 
- static bool m_recentOnly = false; // new
