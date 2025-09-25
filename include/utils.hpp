@@ -22,6 +22,7 @@ bool isGitIgnored(const std::filesystem::path& filePath) ;
  bool onlyIncludedExtensions(const std::string& extension,const std::string&includedFiles);
  bool matchingFileDir(const std::string& path, const std::string& filter);
  void readDisplayFile(const std::filesystem::path& filepath);
+ std::uintmax_t getFileSize(const std::filesystem::path& filepath); // new feature actual tpye is uintmax which is better to write in the return type for avoiding implicit conversion
 
 
  static bool m_recentOnly = false; // new

@@ -137,8 +137,18 @@ bool isGitIgnored(const std::filesystem::path& filePath) {
 	return std::filesystem::path{};
 }
 
+ // new feature for file size
+ std::uintmax_t getFileSize(const std::filesystem::path& filepath) {
 
+	 try {
+		 return std::filesystem::file_size(filepath);
+	 }
+	 catch(const std::filesystem::filesystem_error& e){
+		 std::cerr << "Error getting file size " << e.what() << '\n';
+		 return 0;
+	 }
 
+ }
 
 
 
@@ -257,7 +267,7 @@ void readDisplayFile(const std::filesystem::path& filepath) {
 		return;
 	}
 
-	std::cout << "\n### File:" << std::filesystem::relative(filepath) << '\n';
+	std::cout << "\n### File:" << std::filesystem::relative(filepath) <<" (" << getFileSize(filepath) << " bytes )" << '\n';
 	std::string format = filepath.extension().string();
 	std::cout << "``` " << getLanguageExtension(format) << '\n';
 	int bytes = 0;
