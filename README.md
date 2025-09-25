@@ -163,6 +163,8 @@ README.md
     renderer.cpp
     renderer.hpp
     utils.cpp
+    filter.cpp
+    filter.cpp
 vcpkg.json
 
 
@@ -217,6 +219,8 @@ osdProjects/ # that is a local development directory
     │   ├── renderer.cpp      # Output rendering
     │   ├── renderer.hpp      # Renderer declarations
     │   └── utils.cpp         # Utility functions
+    |   └── filter.hpp        #Filtering declarations
+    |   └── filter.cpp        # Filtering new features
     ├── CMakeLists.txt        # Build configuration
     ├── vcpkg.json           # Dependencies
     └── README.md            # README file            
