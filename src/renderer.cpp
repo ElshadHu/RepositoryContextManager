@@ -40,7 +40,8 @@ namespace output {
 					<< " -o --output  Write output to file\n"
 					<< " --include  Include file extensions (*.cpp,*.h)\n"
 					<< " --exclude  Exclude files \n"
-					<< " -r --recent  Show recently modified files \n"; //new
+					<< " -r --recent  Show recently modified files \n"
+					<< "--dirs-only -d Show Directory Structure with other sections except for File Contents\n";//new
 				return true;
 			}
 
@@ -139,6 +140,8 @@ namespace output {
 			std::ofstream fileOutput;
 
 			std::ostream& o = targetOut(fileOutput, filename);
+			bool isOnlyDir = opt.dirsOnly;
+
 			for (const auto& input : opt.inputFiles) {
 				const auto absolute = std::filesystem::absolute(input);
 				o << "## File System Location\n\n" << absolute.string() << "\n\n";
@@ -148,7 +151,10 @@ namespace output {
 				}
 				writeGitInfo(o, absolute);
 				writeFileStructure(o, absolute);
-				 writeFileContents(o, absolute,opt);
+
+				if (!isOnlyDir) {
+					writeFileContents(o, absolute, opt);
+				}
 				 writeFileStatistics(o, absolute, opt);
 			}
 

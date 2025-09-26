@@ -7,6 +7,8 @@ namespace cli {
 	Options	parse(int argc, char** argv) {
 		Options options;
 
+		
+
 		for (int i = 1; i < argc;i++) {
 			std::string_view argument = argv[i]; //every time gets the imput and checks the below conditions
 
@@ -51,6 +53,15 @@ namespace cli {
 				options.onRecentFilter = [](const std::filesystem::path& path) {
 					return isRecentlyModified(path);
 					};
+			}
+			//new
+			else if (argument == "--dirs-only" || argument == "-d") {
+					options.dirsOnly = true;
+			}
+			// new  for error handling when writing ---help or -helpp
+			else if (argument[0] == '-') {
+				std::cerr << "Unknown command:" << argument << '\n';
+				options.showHelp = true;
 			}
 
 			else {
