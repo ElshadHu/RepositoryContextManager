@@ -126,7 +126,7 @@ repoctx ./src --recent --exclude "README.md" --output recently-updated-files.md
 | `--include`       | Include file extensions            | `--include "*.cpp,*.h"`           |
 | `--exclude`       | Exclude file patterns               | `--exclude "test,build"`          |
 | `--recent`       | Show files modified in the last 7 days | `repoctx . -r`          |
-
+| `--dirs-only`,`-d`| Show directory structure with ohter sections except for File Contents | `repoctx . -d` |
 
 # Output Format 
 ```markdown
@@ -180,8 +180,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
   --  At the end file data
   Total Files: 15
 Total Lines: 1,247
-Total Tokens: 4,532
-
 ```
 
 
