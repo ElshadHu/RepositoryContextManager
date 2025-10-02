@@ -21,7 +21,8 @@ add_executable(repoctx
     src/git_info.cpp
     src/renderer.cpp
     src/utils.cpp
-    src/filter.cpp )
+    src/filter.cpp
+    src/config_manager.cpp )
 
 target_include_directories(repoctx PRIVATE src include)
 
