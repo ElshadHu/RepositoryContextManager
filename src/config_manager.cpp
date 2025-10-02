@@ -1,45 +1,63 @@
 #include "config_manager.hpp"
-#include <toml++/toml.h>
-#include <filesystem>
-#include <iostream>
-
-ConfigManager::ConfigManager(const std::string &path)
-    : configPath(path) {}
-
-void ConfigManager::applyTo(cli::Options &options) const
+namespace config
 {
-    if (!std::filesystem::exists(configPath))
+
+    cli::Options loadFromConfig(const std::string &path)
     {
-        std::cerr << "Warning: " << configPath << " not found, using CLI args only.\n";
-        return;
+        cli::Options opts;
+
+        if (!std::filesystem::exists(path))
+        {
+            return opts;
+        }
+
+        try
+        {
+            auto tbl = toml::parse_file(path);
+
+            if (auto out = tbl["output"].value<std::string>())
+                opts.outputFile = *out;
+
+            if (auto inc = tbl["include"].value<std::string>())
+            {
+                opts.includePattern = *inc;
+                std::string pattern = *inc;
+                opts.onIncludeFilter = [pattern](const std::filesystem::path &p)
+                {
+                    return onlyIncludedExtensions(p.string(), pattern);
+                };
+            }
+
+            if (auto exc = tbl["exclude"].value<std::string>())
+            {
+                opts.excludePattern = *exc;
+                std::string pattern = *exc;
+                opts.onExcludeFilter = [pattern](const std::filesystem::path &p)
+                {
+                    return excludedExtensions(p.string(), pattern);
+                };
+            }
+
+            if (auto rec = tbl["recent"].value<bool>(); rec && *rec)
+            {
+                opts.recent = true;
+                opts.onRecentFilter = [](const std::filesystem::path &p)
+                {
+                    return isRecentlyModified(p);
+                };
+            }
+
+            if (auto dirs = tbl["dirs_only"].value<bool>(); dirs && *dirs)
+            {
+                opts.dirsOnly = true;
+            }
+        }
+        catch (const toml::parse_error &err)
+        {
+            std::cerr << "Failed to parse config.toml: " << err << "\n";
+        }
+
+        return opts;
     }
 
-    try
-    {
-        auto config = toml::parse_file(configPath);
-
-        if (auto out = config["output"].value<std::string>())
-            if (options.outputFile.empty())
-                options.outputFile = *out;
-
-        if (auto inc = config["include"].value<std::string>())
-            if (options.includePattern.empty())
-                options.includePattern = *inc;
-
-        if (auto exc = config["exclude"].value<std::string>())
-            if (options.excludePattern.empty())
-                options.excludePattern = *exc;
-
-        if (auto dirs = config["dirs_only"].value<bool>())
-            options.dirsOnly = *dirs;
-
-        if (auto rec = config["recent"].value<bool>())
-            options.recent = *rec;
-    }
-    catch (const toml::parse_error &err)
-    {
-        std::cerr << "Error parsing " << configPath << ": "
-                  << err.description()
-                  << " at " << err.source().begin << "\n";
-    }
-}
+} // namespace config
