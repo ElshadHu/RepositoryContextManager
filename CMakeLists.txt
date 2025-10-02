@@ -26,7 +26,15 @@ add_executable(repoctx
 target_include_directories(repoctx PRIVATE src include)
 
 # Link toml++ to target
-target_link_libraries(repoctx PRIVATE tomlplusplus)
+target_link_libraries(repoctx tomlplusplus::tomlplusplus)
+
+# Add config.toml to build folder
+add_custom_command(TARGET repoctx POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/config.toml
+        $<TARGET_FILE_DIR:repoctx>/config.toml
+)
+
 
 # It tries to find system libgit2 
 find_package(PkgConfig QUIET)
