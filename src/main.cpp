@@ -8,9 +8,9 @@
 
 int main(int argc, char **argv)
 {
-    cli::Options opt;
     try
     {
+        cli::Options opt;
 
         ConfigManager cfg;
         cfg.applyTo(opt);
