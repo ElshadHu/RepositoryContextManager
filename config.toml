@@ -1,0 +1,5 @@
+output = "output.txt"
+include = "*.cpp,*.h"
+exclude = "test,build"
+dirs_only = false
+recent = false
