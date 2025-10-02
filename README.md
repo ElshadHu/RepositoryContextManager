@@ -1,24 +1,30 @@
 # RepositoryContextPackager
-Command-line tool that analyzes  local git repositories and creates a text file containing repository content optimized for sharing with Large Language Models (LLMs).This tool helps developers efficiently share their codebase context with Ai tools such as ChatGPT via collection repository information,project structure and file contents into a single, well-designed document.
+
+Command-line tool that analyzes local git repositories and creates a text file containing repository content optimized for sharing with Large Language Models (LLMs).This tool helps developers efficiently share their codebase context with Ai tools such as ChatGPT via collection repository information,project structure and file contents into a single, well-designed document.
 
 # Features
-- **Git Integration** - Automatically detects Git repository information (commit, branch, author, date)
-- **Smart File Discovery** - Recursively analyzes directories and individual files
-- **Multiple File Type Support** - Handles C/C++, JavaScript, Python, Java, TypeScript, and configuration files
-- **Error Handling** - Gracefully handles permission errors and inaccessible files
-- **File Size Management** - Automatically truncates large files (>16KB) with truncation notices
-- **Flexible Input** - Supports analyzing directories, individual files, or combinations
-- **Include/Exclude Feature** Supports including or excluding specific folders or files
+
+-   **Git Integration** - Automatically detects Git repository information (commit, branch, author, date)
+-   **Smart File Discovery** - Recursively analyzes directories and individual files
+-   **Multiple File Type Support** - Handles C/C++, JavaScript, Python, Java, TypeScript, and configuration files
+-   **Error Handling** - Gracefully handles permission errors and inaccessible files
+-   **File Size Management** - Automatically truncates large files (>16KB) with truncation notices
+-   **Flexible Input** - Supports analyzing directories, individual files, or combinations
+-   **Include/Exclude Feature** Supports including or excluding specific folders or files
+-   **Config File Support** - Automatically loads options from config.toml, allowing CLI overrides for flexible and maintainable workflows
 
 # Prerequisites
-- CMake 3.20 or higher
-- C++17 compatible compiler
-- Git(for repository analysis features)
+
+-   CMake 3.20 or higher
+-   C++17 compatible compiler
+-   Git(for repository analysis features)
+
 # Installation
 
 # 1. Install vcpkg and dependencies
 
-# Clone vcpkg  Windows (if not already installed)
+# Clone vcpkg Windows (if not already installed)
+
 ```bash
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
@@ -28,8 +34,11 @@ $env:VCPKG_ROOT = $PWD
 # Install libgit2 for Windows x64
 .\vcpkg install libgit2:x64-windows
 ```
+
 # 2. Build the project
+
 ## Clone this repository
+
 ```bash
 git clone https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
@@ -45,7 +54,9 @@ cmake --build build
 cmake -B build
 cmake --build build
 ```
+
 # Linux
+
 ```bash
 1.
 git clone https://github.com/Microsoft/vcpkg.git
@@ -67,20 +78,24 @@ cmake --build build
 ```
 
 # macOS
+
 ```bash
 # Install dependencies
 brew install cmake libgit2 pkg-config git
 
-# Build 
+# Build
 git clone https://github.com/ElshadHu/RepositoryContextPackager
 cd RepositoryContextPackager
 cmake -B build
 cmake --build build
 ```
+
 # Usage
+
 ## Basic Commands
+
 ```bash
-# Analyze current directory
+# Use config.toml for default options and analyze current directory
 repoctx .
 
 # Analyze specific directory with output file
@@ -103,12 +118,13 @@ repoctx --version
 ```
 
 # Advanced Usage
+
 ```
 # Analyze C++ project, excluding tests and build files
 repoctx . --include "*.cpp,*.hpp,*.h" --exclude "test,build" --output cpp-analysis.md
 
 # Analyze multiple directories
-repoctx src docs 
+repoctx src docs
 
 # Mix files and directories
 repoctx src README.md CMakeLists.txt --output project-overview.md
@@ -118,19 +134,28 @@ repoctx ./src --recent --exclude "README.md" --output recently-updated-files.md
 ```
 
 # Command Line Options
-| Option           | Description                       | Example                          |
-|------------------|-----------------------------------|----------------------------------|
-| `--help`, `-h`    | Show help message                  | `repoctx -h`                     |
-| `--version`, `-v` | Show version info                  | `repoctx -v`                     |
-| `--output`, `-o`  | Output file path                   | `repoctx -o report.md`           |
-| `--include`       | Include file extensions            | `--include "*.cpp,*.h"`           |
-| `--exclude`       | Exclude file patterns               | `--exclude "test,build"`          |
-| `--recent`       | Show files modified in the last 7 days | `repoctx . -r`          |
-| `--dirs-only`,`-d`| Show directory structure with ohter sections except for File Contents | `repoctx . -d` |
 
-# Output Format 
-```markdown
+| Option             | Description                                                           | Example                  |
+| ------------------ | --------------------------------------------------------------------- | ------------------------ |
+| `--help`, `-h`     | Show help message                                                     | `repoctx -h`             |
+| `--version`, `-v`  | Show version info                                                     | `repoctx -v`             |
+| `--output`, `-o`   | Output file path                                                      | `repoctx -o report.md`   |
+| `--include`        | Include file extensions                                               | `--include "*.cpp,*.h"`  |
+| `--exclude`        | Exclude file patterns                                                 | `--exclude "test,build"` |
+| `--recent`         | Show files modified in the last 7 days                                | `repoctx . -r`           |
+| `--dirs-only`,`-d` | Show directory structure with ohter sections except for File Contents | `repoctx . -d`           |
+
+# Config
+
+Use `config.toml` to specify default arguments.  
+**Precedence:** CLI options override `config.toml`, which overrides built-in defaults.  
+**Note:** If you're modifying `config.toml`, you may need to rerun `cmake --build build` to ensure the updated file is copied into the build folder (depending on your setup).
+
+# Output Format
+
+````markdown
 PS D:\osdProjects\RepositoryContextPackager> .\build\repoctx.exe .
+
 # Repository Context
 
 ## File System Location
@@ -139,38 +164,37 @@ D:\osdProjects\RepositoryContextPackager
 
 ### GIT INFO
 
-- Commit: 4e96146d00cc70854c98e70caf5cf597553daca2
-- Branch: main
-- Author: Elshad Humbatli< elsadhumbetli079@gmail.com >
-- Date: Thu Sep 18 02:30:16 2025
+-   Commit: 4e96146d00cc70854c98e70caf5cf597553daca2
+-   Branch: main
+-   Author: Elshad Humbatli< elsadhumbetli079@gmail.com >
+-   Date: Thu Sep 18 02:30:16 2025
 
 Structure
 
 CMakeLists.txt
 CMakeSettings.json
 \include
-    utils.hpp
+utils.hpp
 LICENSE
 README.md
 \src
-    cli.cpp
-    cli.hpp
-    fs_travel.cpp
-    fs_travel.hpp
-    git_info.cpp
-    git_info.hpp
-    main.cpp
-    renderer.cpp
-    renderer.hpp
-    utils.cpp
-    filter.cpp
-    filter.cpp
+cli.cpp
+cli.hpp
+fs_travel.cpp
+fs_travel.hpp
+git_info.cpp
+git_info.hpp
+main.cpp
+renderer.cpp
+renderer.hpp
+utils.cpp
+filter.cpp
+filter.cpp
 vcpkg.json
 
-
-
 ### File:"CMakeLists.txt"
-``` text
+
+```text
 cmake_minimum_required(VERSION 3.20)
 project(repoctx VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
@@ -181,7 +205,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
   Total Files: 15
 Total Lines: 1,247
 ```
-
+````
 
 # Testing from Source
 
@@ -198,11 +222,12 @@ cmake --build build --config Release
 ```
 
 ## Project Structure
-``` bash
+
+```bash
 osdProjects/ # that is a local development directory
 ├── vcpkg/                          # C++ package manager
 |     ├── scripts/buildsystems/vcpkg.cmake
-│     └── [vcpkg installation files...] 
+│     └── [vcpkg installation files...]
 └── RepositoryContextPackager/      # This project
     ├── include/
     │   └── utils.hpp         # Utility function declarations
@@ -221,23 +246,23 @@ osdProjects/ # that is a local development directory
     |   └── filter.cpp        # Filtering new features
     ├── CMakeLists.txt        # Build configuration
     ├── vcpkg.json           # Dependencies
-    └── README.md            # README file            
+    └── README.md            # README file
 ```
-# Contributing
-- Fork the repository
-- Create your feature branch (git checkout -b feature/recent)
-- Commit your changes (git commit -m 'feature added')
-- Push to the branch (git push origin feature/recent)
-- Open a Pull Request
 
+# Contributing
+
+-   Fork the repository
+-   Create your feature branch (git checkout -b feature/recent)
+-   Commit your changes (git commit -m 'feature added')
+-   Push to the branch (git push origin feature/recent)
+-   Open a Pull Request
 
 # License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-
 # Essentials
+
 Built with libgit2 for Git repository access
 Uses vcpkg for dependency management
 Designed for integration with Large Language Models
-
-
