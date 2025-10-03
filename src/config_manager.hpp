@@ -6,8 +6,7 @@
 #include <filesystem>
 #include <iostream>
 
-namespace config
-{
+namespace config {
     cli::Options loadFromConfig(const std::string &path);
 }
 
