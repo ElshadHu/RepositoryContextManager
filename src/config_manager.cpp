@@ -3,21 +3,23 @@ namespace config {
     cli::Options loadFromConfig(const std::string &path) {
         cli::Options opts;
 
-        if (!std::filesystem::exists(path)) {
+        if (!std::filesystem::exists(path)) { // Config doesn't exist; return default options
             return opts;
         }
 
         try {
-            auto tbl = toml::parse_file(path);
-
-            if (auto out = tbl["output"].value<std::string>())
-                opts.outputFile = *out;
+            auto tbl = toml::parse_file(path); // Parse TOML file into table
+            
+            // Loading of each argument value from table
+            if (auto out = tbl["output"].value<std::string>()) // Checks if key exists and assigns string
+                opts.outputFile = *out; // Dereferences and stores the string in Options struct
 
             if (auto inc = tbl["include"].value<std::string>()) {
                 opts.includePattern = *inc;
-                std::string pattern = *inc;
+                std::string pattern = *inc; // Copy for use in lambda
+                // Takes in variable pattern and argument for file path and passes into filter function
                 opts.onIncludeFilter = [pattern](const std::filesystem::path &p) {
-                    return onlyIncludedExtensions(p.string(), pattern);
+                    return onlyIncludedExtensions(p.string(), pattern); 
                 };
             }
 
