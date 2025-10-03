@@ -1,0 +1,5 @@
+output = "output.md"
+include = ""
+exclude = ""
+dirs_only = false
+recent = false

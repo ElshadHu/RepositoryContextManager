@@ -3,6 +3,15 @@ project(repoctx VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Adding TOML fetch
+include(FetchContent)
+FetchContent_Declare(
+  tomlplusplus
+  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+  GIT_TAG v3.4.0 # or latest stable
+)
+FetchContent_MakeAvailable(tomlplusplus)
+
 # if does not open try   link_directories("<Path-to-vcpkg>/installed/x64-windows/lib")
 
 add_executable(repoctx
@@ -12,9 +21,20 @@ add_executable(repoctx
     src/git_info.cpp
     src/renderer.cpp
     src/utils.cpp
-    src/filter.cpp )
+    src/filter.cpp
+    src/config_manager.cpp )
 
 target_include_directories(repoctx PRIVATE src include)
+
+# Link toml++ to target
+target_link_libraries(repoctx tomlplusplus::tomlplusplus)
+
+# Add config.toml to build folder
+add_custom_command(TARGET repoctx POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/config.toml
+        $<TARGET_FILE_DIR:repoctx>/config.toml
+)
 
 
 # It tries to find system libgit2 
