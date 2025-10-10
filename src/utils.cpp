@@ -180,24 +180,6 @@ bool isGitIgnored(const std::filesystem::path& filePath) {
 
 
 
-
-std::size_t countTokens(const std::filesystem::path& filepath) {
-	std::ifstream file(filepath);
-	if (!file) {
-		std::cerr << "file did not open for tokens: " << filepath << '\n';
-		return 0;
-	}
-	char perChar;
-	std::size_t numOfChars = 0;
-	while (file.get(perChar)) {
-		numOfChars++;
-	}
-
-	return numOfChars / 4;
-}
-
-
-
 std::size_t countLines(const std::filesystem::path& filepath) {
 
 	std::ifstream file(filepath);
@@ -270,11 +252,11 @@ void readDisplayFile(const std::filesystem::path& filepath) {
 	std::cout << "\n### File:" << std::filesystem::relative(filepath) <<" (" << getFileSize(filepath) << " bytes )" << '\n';
 	std::string format = filepath.extension().string();
 	std::cout << "``` " << getLanguageExtension(format) << '\n';
-	int bytes = 0;
+	size_t bytes = 0;
 	std::string str;
 	bool truncated = false;
 	while (std::getline(file, str)) {
-		if (bytes + str.length() > SIZEOFFILE) {
+		if (bytes + str.length() > MAX_SIZE_FILE) {
 			truncated = true;
 			break;
 		}
@@ -282,8 +264,22 @@ void readDisplayFile(const std::filesystem::path& filepath) {
 		bytes += str.length() + 1;//for newline
 	}
 	if (truncated) {
-		std::cout << "\n.. [File truncated - exceeded " << SIZEOFFILE << " bytes\n";
+		std::cout << "\n.. [File truncated - exceeded " << MAX_SIZE_FILE << " bytes\n";
 	}
 	std::cout << "```" << '\n';
 }
 
+void showHelp() {
+	std::cout << "the usage of repoctx [path..] [options]\n"
+		<< "-h --help Show help\n"
+		<< "-v --version Show version\n"
+		<< " -o --output  Write output to file\n"
+		<< " --include  Include file extensions (*.cpp,*.h)\n"
+		<< " --exclude  Exclude files \n"
+		<< " -r --recent  Show recently modified files \n"
+		<< "--dirs-only -d Show Directory Structure with other sections except for File Contents\n";
+}
+
+void showVersion() {
+	std::cout << "repoctx release 0.1\n";
+}

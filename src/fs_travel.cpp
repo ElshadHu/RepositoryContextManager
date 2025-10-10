@@ -49,7 +49,7 @@ namespace fsTravel {
 
 				
 				
-				// Process directories recursively
+				
 				if (entry.is_directory()) {
 					std::cout << indent(depth)<< "/" << fileOrDir << '\n';
 						travelDirTree(entry.path(), depth + 1);	
@@ -80,7 +80,7 @@ namespace fsTravel {
 		*/
 
 	void travelFileContents(const fs::path& pathToAnalyze) {
-	/*	TotalStatistics totals{ 0,0,0 };*/
+	
 		std::error_code errCode;
 		try {
 			
@@ -97,7 +97,7 @@ namespace fsTravel {
 
 				if (entry.is_regular_file() && !isGitIgnored(entry.path())) {
 					const auto extension = entry.path().extension().string();
-						readDisplayFile(entry.path()); //every time calls the files via the help of recursion
+						readDisplayFile(entry.path()); 
 				}
 			}
 		}

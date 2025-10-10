@@ -8,6 +8,7 @@
 
 namespace config {
     cli::Options loadFromConfig(const std::string &path);
+    cli::Options mergeOptions(const cli::Options& configOptions, const cli::Options& cliOpts);
 }
 
 #endif

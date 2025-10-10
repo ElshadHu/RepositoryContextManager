@@ -34,19 +34,12 @@ namespace output {
 
 	bool writeCliCommands( const cli::Options& opt) {
 			if (opt.showHelp) {
-				std::cout << "the usage of repoctx [path..] [options]\n"
-					<< "-h --help Show help\n"
-					<< "-v --version Show version\n"
-					<< " -o --output  Write output to file\n"
-					<< " --include  Include file extensions (*.cpp,*.h)\n"
-					<< " --exclude  Exclude files \n"
-					<< " -r --recent  Show recently modified files \n"
-					<< "--dirs-only -d Show Directory Structure with other sections except for File Contents\n";//new
+				showHelp();
 				return true;
 			}
 
 			if (opt.showVersion) {
-				std::cout << "repoctx release 0.1\n";
+				showVersion();
 				return true;
 			}
 
@@ -83,7 +76,7 @@ namespace output {
 
 		std::error_code err;
 
-		if (std::filesystem::is_regular_file(path) && filter.checkingExcludeInclude(path)) {
+		if (std::filesystem::is_regular_file(path) && filter.isMatchingFilters(path)) {
 			totalFiles += 1;
 			totalLines += countLines(path);
 		}
@@ -92,7 +85,7 @@ namespace output {
 			for (const auto& entry : std::filesystem::recursive_directory_iterator(path, err)) {
 		
 				if (err) continue;
-				if (entry.is_regular_file() && filter.checkingExcludeInclude(entry.path())) {
+				if (entry.is_regular_file() && filter.isMatchingFilters(entry.path())) {
 					totalFiles += 1;
 					totalLines += countLines(entry.path());
 				}
@@ -117,13 +110,13 @@ namespace output {
 
 		std::error_code err;
 
-		if (std::filesystem::is_regular_file(path) && filter.checkingExcludeInclude(path)) {
+		if (std::filesystem::is_regular_file(path) && filter.isMatchingFilters(path)) {
 			fsTravel::travelFileContents(path);
 		}
 		else if (std::filesystem::is_directory(path)) {
 			for (const auto& entry : std::filesystem::recursive_directory_iterator(path, err)) {
 				if (err) continue;
-				if (entry.is_regular_file() && filter.checkingExcludeInclude(entry.path())) {
+				if (entry.is_regular_file() && filter.isMatchingFilters(entry.path())) {
 					readDisplayFile(entry.path());
 				}
 			}

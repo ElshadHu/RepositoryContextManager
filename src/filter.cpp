@@ -6,7 +6,7 @@ namespace Filter {
 
 
 	
-	bool FilterManager::checkingExcludeInclude(const std::filesystem::path& filepath) const {
+	bool FilterManager::isMatchingFilters(const std::filesystem::path& filepath) const {
 		if (!std::filesystem::exists(filepath) || isGitIgnored(filepath))
 			return false;
 

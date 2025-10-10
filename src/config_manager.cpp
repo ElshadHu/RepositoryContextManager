@@ -48,4 +48,43 @@ namespace config {
 
         return opts;
     }
+
+
+    cli::Options mergeOptions(const cli::Options& configOptions, const cli::Options& cliOpts) {
+        cli::Options merged = configOptions;
+
+        if (!cliOpts.outputFile.empty()) {
+            merged.outputFile = cliOpts.outputFile;
+        }
+
+        if (!cliOpts.includePattern.empty()) {
+            merged.includePattern = cliOpts.includePattern;
+            merged.onIncludeFilter = cliOpts.onIncludeFilter;
+        }
+
+        if (!cliOpts.excludePattern.empty()) {
+            merged.excludePattern = cliOpts.excludePattern;
+            merged.onExcludeFilter = cliOpts.onExcludeFilter;
+        }
+
+        if (cliOpts.recent) {
+            merged.recent = true;
+            merged.onRecentFilter = cliOpts.onRecentFilter;
+        }
+        if (cliOpts.dirsOnly) {  
+            merged.dirsOnly = true;
+        }
+        if (cliOpts.showHelp) {
+            merged.showHelp = true;
+        }
+        if (cliOpts.showVersion) {
+            merged.showVersion = true;
+        }
+
+        if (!cliOpts.inputFiles.empty()) {
+            merged.inputFiles = cliOpts.inputFiles;
+        }
+        return merged;
+
+     }
 }
